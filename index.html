@@ -578,6 +578,12 @@
       <button class="main" id="startBtnMobile">📱 모바일로 영상 만들기</button>
     </div>
     <div class="hint">📱 모바일은 화면 해상도·용량을 낮춰 폰에서도 안정적으로 만들어지도록 최적화합니다(유튜브 업로드 화질로는 충분해요). 렌더링 중엔 화면이 꺼지거나 다른 앱으로 전환되면 실패할 수 있으니, 화면을 켜둔 채로 이 탭을 계속 보고 있어주세요.</div>
+    <div class="hint" style="color:#c0392b; font-weight:700; margin-top:6px;">
+      ⚠️ 카카오톡 등 메신저로 이 링크를 받으신 경우, 채팅 안에서 링크를 바로 누르지 마세요 — 메신저 자체 내장
+      브라우저로 열리면 기능이 제대로 동작하지 않을 수 있습니다. 링크를 <b>길게 눌러 "링크 복사"</b>를 하신 뒤,
+      <b>크롬(Chrome)·엣지(Edge)·사파리(Safari) 같은 실제 브라우저 앱을 직접 열어서 주소창에 붙여넣기</b>로
+      들어와주세요.
+    </div>
 
     <div class="render-btn-row" id="renderControls" style="display:none;">
       <button class="secondary" id="pauseBtn">⏸ 일시정지</button>
@@ -922,8 +928,17 @@ function addCustomFont(label, family) {
   const id = 'custom' + (++customFontCounter);
   const choice = { id, label, family: `"${family}","Noto Sans KR",sans-serif` };
   FONT_CHOICES.push(choice);
-  renderFontPickRow();
   addFontOptionToSelects(choice);
+  // ⚠️ 폰트를 새로 올리면, 자막에만 적용되고 제목/닉네임 글꼴 선택창은 그대로 남아있어서 영상에
+  // 서로 다른 폰트가 섞여 나오는 문제가 있었습니다. 일부러 폰트 파일까지 올리는 사용자는 보통
+  // 영상 전체에 그 폰트를 통일해서 쓰고 싶어 하므로, 새 폰트를 자막/제목/닉네임 전부에 한 번에
+  // 적용합니다(원하면 각 선택창에서 나중에 따로 바꿀 수 있습니다).
+  captionFontFamily = choice.family;
+  renderFontPickRow();
+  ['titleFontSelect', 'nicknameFontSelect'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (sel) sel.value = id;
+  });
   return choice;
 }
 
@@ -950,7 +965,7 @@ if (customFontInput) {
       }
     }
     customFontStatus.textContent = okCount
-      ? `✅ ${okCount}개 폰트 추가 완료 — 위 목록과 제목/닉네임 글꼴 선택창에서 고를 수 있어요.`
+      ? `✅ ${okCount}개 폰트 추가 완료 — 자막·제목·닉네임에 자동으로 이 폰트가 적용됐어요(각각 다시 골라서 바꿀 수도 있어요).`
       : `⚠️ 폰트를 불러오지 못했습니다. 파일 형식(.ttf/.otf/.woff/.woff2)을 확인해주세요.`;
   });
 }
@@ -2026,7 +2041,7 @@ saveLyricsBtn.addEventListener('click', () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'mr_video_가사백업.txt';
+  a.download = 'SLSM_가사백업.txt';
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -2407,7 +2422,8 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
     } else {
       statusText.textContent = '완료!';
     }
-    downloadArea.innerHTML = `<a class="download-btn" href="${url}" download="mr_video${isTest ? '_test10s' : ''}.${ext}">⬇️ ${isTest ? '테스트 영상' : '완성된 영상'} 다운로드 (.${ext})</a>`;
+    const downloadName = `심플 가사 영상 제작기(SLSM)${isTest ? '_test10s' : ''}.${ext}`;
+    downloadArea.innerHTML = `<a class="download-btn" href="${url}" download="${downloadName}">⬇️ ${isTest ? '테스트 영상' : '완성된 영상'} 다운로드 (.${ext})</a>`;
     progressBar.style.width = '100%';
     startBtnPC.disabled = false; startBtnMobile.disabled = false;
     testBtn.disabled = false;
