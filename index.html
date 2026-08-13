@@ -612,7 +612,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     심플 가사 영상 제작기(Simple Lyric Scene Maker)는 무료로 배포하나, 출처 표기를 부탁드립니다.<br>
-    <span id="appVersion" style="opacity:0.7;">v1.1 · 2026-08-13 업데이트 (모바일 랜더링 성능 개선)</span>
+    <span id="appVersion" style="opacity:0.7;">v1.2 · 2026-08-13 업데이트 (사진 다운스케일로 프리징 추가 개선, 폰트 통일, 빈 줄 버그 수정)</span>
   </div>
 </div>
 
@@ -800,6 +800,23 @@ function loadImage(file) {
   });
 }
 
+// 아이폰 등 요즘 카메라 사진은 원본이 가로/세로 3000~4000px 이상으로 매우 큰 경우가 많습니다. 매
+// 프레임(초당 30번) 이 큰 원본에서 그대로 그림을 그리면(특히 확대/이동 효과와 겹치면) 저사양 기기에서
+// 프레임을 못 따라가는 주요 원인이 됩니다("랜더링 프리징"). 실제 화면에 필요한 건 출력 해상도(w×h)에
+// 확대 효과 여유(최대 약 1.3배)를 더한 정도뿐이므로, 렌더링을 시작하기 전에 딱 한 번만 이 크기로
+// 줄여서 오프스크린 캔버스에 다시 그려두고, 매 프레임에는 이 작아진 버전만 사용합니다.
+function downscaleForCanvas(img, w, h) {
+  const targetLongSide = Math.max(w, h) * 1.4;
+  const longSide = Math.max(img.width, img.height);
+  if (longSide <= targetLongSide) return img; // 원본이 이미 충분히 작으면 그대로 사용
+  const scale = targetLongSide / longSide;
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(img.width * scale));
+  c.height = Math.max(1, Math.round(img.height * scale));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c;
+}
+
 // ---- 가사 파싱 ----
 function parseLrc(text, duration) {
   const lines = text.split('\n');
@@ -809,7 +826,7 @@ function parseLrc(text, duration) {
     const m = line.match(re);
     if (!m) continue;
     const start = parseInt(m[1], 10) * 60 + parseFloat(m[2]);
-    const t = m[3].trim();
+    const t = stripInvisible(m[3]).trim();
     if (t) entries.push({ start, text: t });
   }
   entries.sort((a, b) => a.start - b.start);
@@ -821,7 +838,7 @@ function parseLrc(text, duration) {
 }
 
 function parsePlain(text, duration, tailPadding = 2) {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = splitLyricsLines(text);
   if (!lines.length) return [];
   const usable = Math.max(duration - tailPadding, 1);
   const seg = usable / lines.length;
@@ -899,8 +916,16 @@ function renderFontPickRow() {
     btn.style.fontFamily = f.family;
     btn.textContent = f.label;
     btn.addEventListener('click', () => {
+      // ⚠️ 자막 폰트만 바꾸면 제목/닉네임과 폰트가 서로 달라져 "폰트가 섞여 나온다"는 문제가
+      // 반복적으로 생겼습니다. 이 폰트 고르기 버튼은 이제 자막뿐 아니라 제목/닉네임까지 한 번에
+      // 같은 폰트로 맞춰서, 기본적으로 영상 전체가 한 가지 폰트로 통일되게 합니다(제목/닉네임을 자막과
+      // 다르게 쓰고 싶으면 아래 각각의 글꼴 선택창에서 나중에 따로 바꿀 수 있습니다).
       captionFontFamily = f.family;
       renderFontPickRow();
+      ['titleFontSelect', 'nicknameFontSelect'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (sel) sel.value = f.id;
+      });
     });
     fontPickRow.appendChild(btn);
   });
@@ -987,10 +1012,23 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+// 다른 문서(카톡, 워드, PDF 등)에서 가사를 복사-붙여넣기하면 눈에는 안 보이는 폭 0 문자(zero-width
+// space 등)가 줄 안에 섞여 들어오는 경우가 있습니다. trim()은 이런 문자를 지우지 못해서, "화면엔
+// 빈 줄처럼 보이는데 실제로는 문자가 있는 줄"이 그대로 진짜 가사 줄로 취급되어 버립니다 — 그 줄은
+// 시간을 찍어도 목록에 글자가 안 보이고, 영상에는 보이지 않는 이상한 자막 한 줄이 끼어드는 원인이
+// 됩니다. 그래서 줄 단위로 다룰 때는 항상 이 함수로 먼저 폭 0 문자를 지우고 다룹니다.
+function stripInvisible(s) {
+  // \u200B \u200C \u200D \uFEFF \u2060 \u00A0 와 같은 눈에 안 보이는 폭 0/비정상 공백 문자를 지웁니다.
+  return (s || '').replace(/[\u200B\u200C\u200D\uFEFF\u2060\u00A0]/g, '');
+}
+function splitLyricsLines(text) {
+  return (text || '').split('\n').map(l => stripInvisible(l).trim()).filter(Boolean);
+}
+
 // "(간주)" 한 줄만 정확히 입력하면 그 구간에서는 화면에 자막 글자가 나오지 않습니다
 // (전주/간주처럼 가사가 없는 구간의 타이밍 표시용 — 타이밍은 다른 줄처럼 그대로 맞추면 됩니다).
 function isInterludeMarker(text) {
-  return (text || '').trim() === '(간주)';
+  return stripInvisible(text || '').trim() === '(간주)';
 }
 
 function drawCaption(ctx, text, w, h, fontSize) {
@@ -1146,7 +1184,7 @@ function fmtDisplaySec(sec) {
 // 3번 칸(가사) 최신 내용을 tapLines에 반영하되, 내용이 그대로인 줄은 이미 맞춰둔 타이밍을
 // 그대로 유지하고 내용이 바뀐 줄만 타이밍을 초기화합니다. 가사를 입력할 때(디바운스 후) 씁니다.
 function syncLyricsLines() {
-  const lines = lyricsInput.value.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = splitLyricsLines(lyricsInput.value);
   const newKnown = lines.map((l, i) => (tapLines[i] === l) ? tapKnownTimings[i] : null);
   tapLines = lines;
   tapKnownTimings = newKnown;
@@ -1353,7 +1391,7 @@ if (false) {
 
   function ensureTapLinesFromTextarea() {
     if (tapLines.length) return true;
-    const lines = lyricsInput.value.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = splitLyricsLines(lyricsInput.value);
     if (!lines.length) { alert('먼저 3번 칸에 가사를 입력해주세요 (한 줄에 한 소절).'); return false; }
     tapLines = lines;
     tapKnownTimings = new Array(tapLines.length).fill(null);
@@ -1651,7 +1689,7 @@ easySeek.addEventListener('change', () => {
 
 function ensureLinesReadyForEasy() {
   if (tapLines.length) return true;
-  const lines = lyricsInput.value.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = splitLyricsLines(lyricsInput.value);
   if (!lines.length) return false;
   tapLines = lines;
   tapKnownTimings = new Array(tapLines.length).fill(null);
@@ -1937,7 +1975,7 @@ function parseLrcTimeEntries(text) {
     const m = line.match(re);
     if (m) {
       const t = parseInt(m[1], 10) * 60 + parseFloat(m[2]);
-      const txt = m[3].trim();
+      const txt = stripInvisible(m[3]).trim();
       if (txt) entries.push({ t, txt });
     }
   });
@@ -1951,7 +1989,7 @@ function parseLrcTimeEntries(text) {
 }
 
 function syncTapStateFromBoxes() {
-  const lines = lyricsInput.value.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = splitLyricsLines(lyricsInput.value);
   const lrcText = lrcResult.value.trim();
 
   if (lines.length) {
@@ -2231,7 +2269,9 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
 
   statusText.textContent = '사진 불러오는 중...';
   const imgFiles = Array.from(imagesInput.files).slice(0, 20); // 최대 20장까지만 사용
-  const images = imgFiles.length ? await Promise.all(imgFiles.map(loadImage)) : [];
+  const loadedImages = imgFiles.length ? await Promise.all(imgFiles.map(loadImage)) : [];
+  if (loadedImages.length) statusText.textContent = '사진 최적화 중...';
+  const images = loadedImages.map(img => downscaleForCanvas(img, w, h));
   const segDur = images.length ? fullDuration / images.length : fullDuration;
 
   // ⚠️ 순서 꼬임 가드: 어느 한 줄의 기록된 시간이 그 앞 줄보다 빠르면(빠르게 클릭하다 실수로
@@ -2263,7 +2303,7 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   // 있으면(예: 예전에 다른 곡을 작업하던 타이밍이 "정확한 타이밍 결과(LRC)" 칸에 남아있는 경우)
   // 그대로 영상에 구워지기 전에 알려주고 확인을 받습니다 — "가사에 없는 가사가 나오는" 문제가
   // 조용히 다시 발생하지 않도록 하는 안전장치입니다.
-  const validLineSet = new Set(lyricsInput.value.split('\n').map(l => l.trim()).filter(Boolean));
+  const validLineSet = new Set(splitLyricsLines(lyricsInput.value));
   const orphanLines = lyrics.filter(L => L.text && !isInterludeMarker(L.text) && !validLineSet.has(L.text));
   if (orphanLines.length) {
     const uniqueTexts = [...new Set(orphanLines.map(L => L.text))];
