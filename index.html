@@ -2292,6 +2292,37 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
     ...dest.stream.getAudioTracks()
   ]);
 
+  // ⚡ 성능 캐싱: 제목/닉네임 배지는 렌더링 내내 내용이 바뀌지 않는데도 예전엔 매 프레임(초당 30번)
+  // 다시 그렸습니다. 글자폭 측정(measureText)·둥근 박스(roundRect)·테두리 그리기 같은 캔버스 작업은
+  // 꽤 무거워서, 특히 저사양 모바일 기기에서 이 작업이 매 프레임 반복되면 정작 화면을 다시 그리는
+  // 속도(requestAnimationFrame 호출 빈도)가 크게 느려지고, 이게 녹화 영상이 버벅이거나 멈춘 것처럼
+  // 보이는("프리징") 핵심 원인이 됩니다. 배지는 딱 한 번만 미리 그려서 캐싱해두고, 매 프레임에는
+  // 이 캐시를 가볍게 복사(drawImage)만 하도록 바꿔 프레임 속도를 크게 개선합니다.
+  const badgeCanvas = document.createElement('canvas');
+  badgeCanvas.width = w; badgeCanvas.height = h;
+  const badgeCtx = badgeCanvas.getContext('2d');
+  drawBadge(badgeCtx, titleText, w, h, titlePos, titleFontSize, {
+    fontFamily: titleFontChoice.family, boxColor: titleBoxColor, textColor: titleTextColor
+  });
+  drawBadge(badgeCtx, nicknameText, w, h, nicknamePos, nicknameFontSize, {
+    fontFamily: nicknameFontChoice.family, boxColor: nicknameBoxColor, textColor: nicknameTextColor
+  });
+
+  // ⚡ 성능 캐싱: 자막 줄도 마찬가지로, 같은 가사 줄(특히 후렴처럼 반복되는 줄)을 매번 테두리+채우기
+  // 텍스트(strokeText/fillText)로 새로 그리는 대신, 줄 텍스트별로 한 번만 그려서 캐시해두고 이후엔
+  // 재사용합니다. strokeText는 캔버스 작업 중에서도 특히 느린 편이라 이 캐싱의 효과가 큽니다.
+  const captionCache = new Map();
+  function getCaptionCanvas(text) {
+    let c = captionCache.get(text);
+    if (!c) {
+      c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      drawCaption(c.getContext('2d'), text, w, h, fontSize);
+      captionCache.set(text, c);
+    }
+    return c;
+  }
+
   const mimeType = pickMimeType();
   if (!mimeType) {
     statusText.textContent = '오류: 이 브라우저는 영상 녹화를 지원하지 않습니다. 크롬/엣지 최신버전을 사용해주세요.';
@@ -2362,32 +2393,28 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
           if (alpha < 1 && !curIsInterlude) {
             ctx.save();
             ctx.globalAlpha = 1 - alpha;
-            drawCaption(ctx, curL.text, w, h, fontSize);
+            ctx.drawImage(getCaptionCanvas(curL.text), 0, 0);
             ctx.restore();
           }
           if (!nextIsInterlude) {
             ctx.save();
             ctx.globalAlpha = alpha;
-            drawCaption(ctx, nextL.text, w, h, fontSize);
+            ctx.drawImage(getCaptionCanvas(nextL.text), 0, 0);
             ctx.restore();
           }
         } else if (!curIsInterlude) {
-          drawCaption(ctx, curL.text, w, h, fontSize);
+          ctx.drawImage(getCaptionCanvas(curL.text), 0, 0);
         }
       } else if (t < targetDuration && !curIsInterlude) {
         // 마지막 줄: 다음 줄이 없으니 노래(영상)가 끝날 때까지 계속 보여줍니다.
-        drawCaption(ctx, curL.text, w, h, fontSize);
+        ctx.drawImage(getCaptionCanvas(curL.text), 0, 0);
       }
     }
 
-    // 제목/닉네임은 매 프레임 무조건 그립니다 — 자막처럼 특정 구간에서만 나오는 게 아니라
-    // 영상 처음부터 끝까지 고정으로 계속 떠 있어야 하기 때문입니다.
-    drawBadge(ctx, titleText, w, h, titlePos, titleFontSize, {
-      fontFamily: titleFontChoice.family, boxColor: titleBoxColor, textColor: titleTextColor
-    });
-    drawBadge(ctx, nicknameText, w, h, nicknamePos, nicknameFontSize, {
-      fontFamily: nicknameFontChoice.family, boxColor: nicknameBoxColor, textColor: nicknameTextColor
-    });
+    // 제목/닉네임은 매 프레임 무조건 나와야 하지만(자막처럼 특정 구간에서만 나오는 게 아니라 영상
+    // 처음부터 끝까지 고정으로 떠 있어야 함), 내용 자체는 안 바뀌므로 위에서 미리 그려둔 캐시를
+    // 가볍게 복사만 합니다(성능 최적화 — 위 badgeCanvas 캐싱 설명 참고).
+    ctx.drawImage(badgeCanvas, 0, 0);
 
     progressBar.style.width = Math.min(100, (t / targetDuration) * 100) + '%';
     statusText.textContent = `렌더링 중... ${t.toFixed(1)}s / ${targetDuration.toFixed(1)}s${isTest ? ' (테스트)' : ''}`;
