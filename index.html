@@ -612,7 +612,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     심플 가사 영상 제작기(Simple Lyric Scene Maker)는 무료로 배포하나, 출처 표기를 부탁드립니다.<br>
-    <span id="appVersion" style="opacity:0.7;">v1.2 · 2026-08-13 업데이트 (사진 다운스케일로 프리징 추가 개선, 폰트 통일, 빈 줄 버그 수정)</span>
+    <span id="appVersion" style="opacity:0.7;">v1.3 · 2026-08-13 업데이트 (녹화 프레임 속도를 기기가 실제로 따라갈 수 있는 값으로 조정, 폰트 캐싱 타이밍 보강, HWP 채움문자로 인한 빈 줄 버그 수정)</span>
   </div>
 </div>
 
@@ -1018,8 +1018,14 @@ function hexToRgba(hex, alpha) {
 // 시간을 찍어도 목록에 글자가 안 보이고, 영상에는 보이지 않는 이상한 자막 한 줄이 끼어드는 원인이
 // 됩니다. 그래서 줄 단위로 다룰 때는 항상 이 함수로 먼저 폭 0 문자를 지우고 다룹니다.
 function stripInvisible(s) {
-  // \u200B \u200C \u200D \uFEFF \u2060 \u00A0 와 같은 눈에 안 보이는 폭 0/비정상 공백 문자를 지웁니다.
-  return (s || '').replace(/[\u200B\u200C\u200D\uFEFF\u2060\u00A0]/g, '');
+  // \u200B \u200C \u200D \uFEFF \u2060 \u00A0 \u2028 \u2029 \u00AD \u3164 \uFFA0 \uFFFC
+  // 와 같은 눈에 안 보이는 폭 0/비정상 공백 문자를 지웁니다.
+  // \u3164(한글 채움 문자)/\uFFA0(반각 한글 채움 문자)는 아래아한글(HWP)이나 일부 문서
+  // 편집기가 줄 간격을 맞추려고 몰래 넣는 "보이지 않는 한글 한 글자"로, 찬송가 가사를
+  // HWP/워드에서 복사해 붙여넣을 때 특히 자주 섞여 들어옵니다 — 남아있으면 trim()으로도 안
+  // 지워져서 "화면엔 빈 줄처럼 보이는데 실제로는 글자가 있는 줄"이 진짜 가사 줄로 잘못
+  // 취급됩니다.
+  return (s || '').replace(/[\u200B\u200C\u200D\uFEFF\u2060\u00A0\u2028\u2029\u00AD\u3164\uFFA0\uFFFC]/g, '');
 }
 function splitLyricsLines(text) {
   return (text || '').split('\n').map(l => stripInvisible(l).trim()).filter(Boolean);
@@ -2241,6 +2247,12 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   await ensureCaptionFontLoaded(fontSize);
   await ensureCaptionFontLoaded(titleFontSize || 22, titleFontChoice.family);
   await ensureCaptionFontLoaded(nicknameFontSize || 22, nicknameFontChoice.family);
+  // 위 3개는 "이 폰트 하나"가 준비됐는지만 확인합니다. 배지/자막을 매 프레임 다시 그리던 예전에는
+  // 혹시 폰트가 조금 늦게 준비돼도 다음 프레임에서 자동으로 맞는 폰트로 다시 그려져 티가 안 났지만,
+  // v1.1부터 배지/자막을 한 번만 그려서 캐싱하다 보니, 그 "한 번"이 폰트 준비보다 아주 조금이라도
+  // 먼저 실행되면 브라우저 기본 폰트로 영상 전체에 박제되는 문제가 생길 수 있습니다. document.fonts.ready
+  // 로 이 문서의 모든 폰트가 완전히 준비된 뒤에 캐싱하도록 한 번 더 확실히 합니다.
+  if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
 
   const audioEl = new Audio();
   audioEl.src = getAudioSrcUrl();
@@ -2327,7 +2339,16 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   source.connect(dest);
   source.connect(audioCtx.destination);
 
-  const canvasStream = canvas.captureStream(30);
+  // ⚡ v1.3: 실측 결과(사용자 실제 기기에서 렌더링한 영상들을 ffprobe로 분석), 캔버스 그리기 자체를
+  // 아무리 가볍게 만들어도(v1.1/v1.2의 캐싱·다운스케일 적용 후에도) 실제 캡처되는 프레임 속도가
+  // 7~9fps 선에서 크게 개선되지 않았습니다. 이는 병목이 "캔버스를 그리는 속도"가 아니라 "그 기기의
+  // 실시간 H.264 인코더가 처리할 수 있는 속도" 자체에 있다는 뜻입니다. 이 상태로 30fps를 요청하면
+  // 인코더가 못 따라가서 프레임을 여기저기 불규칙하게 누락시키고, 그게 "군데군데 멈췄다 튀는"
+  // 프리징으로 보입니다. 애초에 인코더가 안정적으로 따라갈 수 있는 낮은 프레임 속도를 요청하면,
+  // 프레임 수는 적어도 "일정한 간격"으로 나와서 오히려 덜 끊겨 보입니다(사진 슬라이드쇼 성격상
+  // 액션 영상처럼 빠른 움직임이 없어 15fps 안팎이면 체감상 충분히 부드럽습니다).
+  const CAPTURE_FPS = mobileMode ? 10 : 15;
+  const canvasStream = canvas.captureStream(CAPTURE_FPS);
   const combined = new MediaStream([
     ...canvasStream.getVideoTracks(),
     ...dest.stream.getAudioTracks()
@@ -2461,8 +2482,17 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
     statusText.textContent = `렌더링 중... ${t.toFixed(1)}s / ${targetDuration.toFixed(1)}s${isTest ? ' (테스트)' : ''}`;
   }
 
-  function drawLoop() {
-    drawFrame();
+  // 목표(CAPTURE_FPS)보다 자주 그릴 필요가 없으므로(예: 60Hz 화면에서 rAF가 매초 60번 불려도,
+  // 어차피 인코더는 초당 CAPTURE_FPS장만 씁니다), 그 중간중간은 그리기를 건너뛰어 기기 부담을
+  // 줄입니다. 이렇게 아낀 여유를 인코딩 쪽에 더 쓸 수 있게 해서 프레임 누락을 줄이는 것이 목적입니다.
+  const frameIntervalMs = 1000 / CAPTURE_FPS;
+  let lastDrawMs = 0;
+  function drawLoop(nowMs) {
+    const now = typeof nowMs === 'number' ? nowMs : performance.now();
+    if (now - lastDrawMs >= frameIntervalMs - 1) {
+      lastDrawMs = now;
+      drawFrame();
+    }
     if (audioEl.currentTime >= targetDuration) {
       finishRecording();
       return;
