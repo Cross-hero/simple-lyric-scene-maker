@@ -612,7 +612,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     심플 가사 영상 제작기(Simple Lyric Scene Maker)는 무료로 배포하나, 출처 표기를 부탁드립니다.<br>
-    <span id="appVersion" style="opacity:0.7;">v1.5 · 2026-08-13 업데이트 (제목/닉네임 선택창을 직접 바꿔도 자막과 안 맞던 폰트 동기화 버그 수정, 모바일 프리징 목표 fps 추가 하향)</span>
+    <span id="appVersion" style="opacity:0.7;">v1.6 · 2026-08-13 업데이트 (가사 속 숫자/절 번호가 다른 폰트로 깨져 나오던 진짜 원인 발견·수정 — 폰트 로딩 시 실제 글자를 확인하도록 개선)</span>
   </div>
 </div>
 
@@ -1019,9 +1019,16 @@ if (customFontInput) {
 
 // 캔버스에 웹폰트를 쓰려면, 녹화 시작 전에 폰트가 실제로 로딩 완료되어 있어야 합니다
 // (안 그러면 첫 렌더링 프레임들에서 기본 글꼴로 잘못 그려질 수 있습니다).
-function ensureCaptionFontLoaded(fontSize, fontFamily) {
+function ensureCaptionFontLoaded(fontSize, fontFamily, sampleText) {
   const spec = `bold ${fontSize}px ${fontFamily || captionFontFamily}`;
-  return document.fonts.load(spec).catch(() => {});
+  // ⚠️ v1.6: document.fonts.load(spec)처럼 두 번째 인자(text) 없이 부르면, 브라우저는 "이 폰트가
+  // 쓸 수 있는 상태인지"를 내부 기본 샘플 문자 몇 개로만 확인합니다. 구글 폰트는 파일 하나가
+  // 아니라 실제로 쓰이는 글자에 맞춰 유니코드 범위별로 조각(서브셋)을 나눠서 내려주는데, 숫자
+  // ("(1)"의 "1" 같은 절 번호)처럼 그 기본 샘플에 없는 글자는 "로드 완료"로 착각하고 정작 그 글자가
+  // 속한 조각은 안 받아온 채로 넘어가 버립니다 — 찬송가 가사의 "(1)(2)(3)" 같은 절 번호가 캡션에서
+  // 유독 깨진 모양(다른 폰트로 대체됨)으로 나오던 진짜 원인이 이것이었습니다. 실제로 화면에 쓸
+  // 글자를 text로 직접 넘겨서, 그 글자들이 들어있는 조각까지 확실히 받아오도록 합니다.
+  return document.fonts.load(spec, sampleText || undefined).catch(() => {});
 }
 
 // "#rrggbb" 색상 문자열을 rgba(...)로 변환(제목 박스에 반투명도를 적용하기 위함)
@@ -2273,9 +2280,15 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   const nicknameFontSize = (nicknameFontSizeRaw && nicknameFontSizeRaw > 0) ? nicknameFontSizeRaw : null;
   const nicknameBoxColor = hexToRgba(document.getElementById('nicknameBoxColor').value, 0.6);
   const nicknameTextColor = document.getElementById('nicknameTextColor').value;
-  await ensureCaptionFontLoaded(fontSize);
-  await ensureCaptionFontLoaded(titleFontSize || 22, titleFontChoice.family);
-  await ensureCaptionFontLoaded(nicknameFontSize || 22, nicknameFontChoice.family);
+  // 실제로 쓸 글자(가사 전체 + 제목 + 닉네임 + 절 번호 등에 흔히 쓰이는 숫자/괄호/기호)를 전부
+  // 모아서 넘깁니다 — 위 ensureCaptionFontLoaded 설명 참고.
+  const fullSampleText = (
+    lyricsInput.value + ' ' + document.getElementById('titleText').value + ' ' +
+    document.getElementById('nicknameText').value + ' 0123456789().,!?~-·'
+  ).slice(0, 3000);
+  await ensureCaptionFontLoaded(fontSize, null, fullSampleText);
+  await ensureCaptionFontLoaded(titleFontSize || 22, titleFontChoice.family, fullSampleText);
+  await ensureCaptionFontLoaded(nicknameFontSize || 22, nicknameFontChoice.family, fullSampleText);
   // 위 3개는 "이 폰트 하나"가 준비됐는지만 확인합니다. 배지/자막을 매 프레임 다시 그리던 예전에는
   // 혹시 폰트가 조금 늦게 준비돼도 다음 프레임에서 자동으로 맞는 폰트로 다시 그려져 티가 안 났지만,
   // v1.1부터 배지/자막을 한 번만 그려서 캐싱하다 보니, 그 "한 번"이 폰트 준비보다 아주 조금이라도
