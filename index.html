@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>심플 가사 영상 제작기 (Simple Lyric Scene Maker)</title>
+<title>가사영상 — 사진 + 음악 + 가사로 영상 만들기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Do+Hyeon&family=Black+Han+Sans&family=Gowun+Dodum&family=Sunflower&display=swap" rel="stylesheet">
@@ -291,15 +291,27 @@
 </head>
 <body>
 <div class="wrap">
-  <h1 class="app-title">🎬 <span class="title-main">심플 가사 영상 제작기</span><span class="title-sub">Simple Lyric Scene Maker</span></h1>
-  <div class="sub">지원되는 음원과 영상: MP3·M4A·WAV·AAC·FLAC 등 오디오 파일, MP4·MOV 등 동영상 파일(소리만 사용) + 사진 여러 장 + 가사만 넣으면, 자막 자동 합성 영상이 만들어집니다. 설치 없이 이 페이지에서 바로 처리됩니다 (파일은 서버로 전송되지 않고 내 브라우저 안에서만 처리됩니다).</div>
+<div id="inappWarn" style="display:none; margin:0 0 16px; padding:16px 16px 14px;
+  border-radius:12px; background:#fdecea; border:2px solid #c0392b; color:#7d1f18;">
+  <div style="font-size:17px; font-weight:900; line-height:1.45; margin-bottom:6px;">
+    ⚠️ <span id="inappAppName">지금 이 화면</span>에서는 영상 만들기가 <u>안 됩니다</u>
+  </div>
+  <div style="font-size:14px; line-height:1.65; margin-bottom:12px;">
+    카카오톡·밴드·인스타 같은 앱 안에서 열면 영상 저장 기능이 막혀 있습니다.<br>
+    <b>크롬·사파리 같은 보통 브라우저로 열어야</b> 영상이 만들어집니다.
+  </div>
+  <div id="inappBtns" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+  <div id="inappHelp" style="font-size:13px; line-height:1.7; margin-top:10px;"></div>
+</div>
+  <h1 class="app-title">🎬 <span class="title-main">가사영상</span><span class="title-sub">사진 + 음악 + 가사 → 영상</span></h1>
+  <div class="sub"><b>음악 하나 + 사진 몇 장 + 가사</b>를 넣으면 자막이 얹힌 영상이 됩니다.<br><b style="color:#0f9d63;">설치 없음 · 무료 · 사진과 음원은 내 기기 밖으로 나가지 않습니다.</b><details style="margin-top:6px;"><summary style="cursor:pointer;">자세히 (눌러서 보기)</summary>오디오(MP3·M4A·WAV·AAC·FLAC 등)와 동영상(MP4·MOV 등, 소리만 사용)을 모두 넣을 수 있습니다. 모든 처리는 이 페이지 안에서만 일어나고, 파일이 서버로 전송되지 않습니다.</details></div>
 
   <div class="grid">
     <div class="card">
-      <h2><span class="step-num">1</span>음원 - 미디어 파일 (MP3, MP4 등 오디오/동영상 파일)</h2>
+      <h2><span class="step-num">1</span>음원 넣기</h2>
       <label>음원 파일 선택</label>
       <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.flac,.wma,.mp4,.mov,.m4v,.3gp,.webm">
-      <div class="hint">MP3 외에 M4A·WAV·AAC·FLAC 등 오디오 파일은 물론, <b>동영상 파일(MP4/MOV 등)을 선택해도 그 안의 소리만 그대로 사용</b>됩니다(화면은 무시되고 소리만 씁니다). 본인이 사용 권한을 가진 음원만 사용하세요.
+      <div class="hint"><b>동영상을 골라도 소리만 씁니다.</b> 본인이 사용 권한을 가진 음원만 사용하세요.<details style="margin-top:4px;"><summary style="cursor:pointer;">넣을 수 있는 파일 (눌러서 보기)</summary>MP3·M4A·WAV·AAC·FLAC 등 오디오 파일과, MP4·MOV 등 동영상 파일(화면은 무시하고 소리만 사용).</details>
         <details style="margin-top:4px;"><summary style="cursor:pointer;">💡 파일이 목록에 안 보이나요? (눌러서 보기)</summary>
         아이폰/갤럭시에서 구글 드라이브·카카오톡·"내 파일"에 저장한 파일이 선택 화면에 안 보인다면, 보통 파일 형식 필터가 아니라 <b>선택 화면에서 그 위치(구글 드라이브 등)로 직접 들어가지 않아서</b>인 경우가 많습니다.<br>
         · 아이폰: 선택 화면에서 <b>"찾아보기"</b> → 왼쪽 위 <b>"위치"</b>(또는 "…" 더보기) → <b>구글 드라이브</b> 체크/선택 → 저장한 폴더로 이동<br>
@@ -318,16 +330,31 @@
   </div>
 
   <div class="card" id="lyricsCard" style="margin-top:16px;">
-    <h2><span class="step-num">3</span>가사 (한 줄에 한 소절)</h2>
+    <h2><span class="step-num">3</span>가사 넣기 <span style="font-weight:400;font-size:13px;color:var(--muted);">한 줄에 한 소절</span></h2>
       <div class="hint" style="background:#eaf7f0; border:1px solid #bfe3cd; padding:10px; border-radius:8px; line-height:1.7;">
-        📋 <b>순서: ① 가사 입력 → ② 아래 "4. 가사 타이밍 맞추기"에서 재생하며 클릭 → ③ 완료</b>
+        📋 <b>순서: ① 가사 붙여넣기 → ② 아래 "4. 타이밍 맞추기"에서 재생하며 클릭 → ③ 완료</b>
+        <div style="margin-top:6px; font-weight:700; color:#0a6b45;">
+          💡 가사를 <u>먼저 복사해 온 뒤</u> 시작하면 왔다갔다 하지 않아도 됩니다.
+        </div>
         <details style="margin-top:6px;"><summary style="cursor:pointer;">💡 팁 (눌러서 보기)</summary>
         · "코람데오"처럼 특정 문구를 띄우고 싶으면, 그 문구도 가사 줄 하나로 추가해서 똑같이 타이밍만 맞추면 됩니다.
         </details>
       </div>
       <div class="hint" style="color:#c0392b; font-weight:700; margin-top:6px;">
-        ⚠️ 전주·간주처럼 가사가 없는 구간은 그 줄에 <code>(간주)</code> 라고 정확히 입력하세요 — 화면에 자막이 뜨지 않고 타이밍 표시용으로만 쓰입니다.
-        단, 이미 타이밍을 다 맞춘 뒤에 중간에 <code>(간주)</code> 줄을 새로 끼워 넣으면 그 뒤에 있던 줄들의 확정된 타이밍이 전부 초기화됩니다 — <u>가급적 타이밍 맞추기 전에 미리 넣어두세요.</u>
+        ⚠️ 전주·간주 자리에는 <code>(간주)</code> 한 줄을 넣으세요.
+        <details style="margin-top:4px; font-weight:400;"><summary style="cursor:pointer;">왜 필요한가요? (눌러서 보기)</summary>
+        <code>(간주)</code> 줄은 화면에 자막이 뜨지 않고 타이밍 표시용으로만 쓰입니다.
+        타이밍을 다 맞춘 뒤에 중간에 끼워 넣으면 그 뒤 줄들의 타이밍이 초기화되니,
+        <u>타이밍 맞추기 전에 미리 넣어두세요.</u>
+        </details>
+      </div>
+      <div class="row" style="margin:8px 0 6px; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button type="button" id="pasteLyricsBtn"
+          style="flex:0 0 auto; font-size:17px; font-weight:800; padding:13px 22px; border-radius:10px;
+                 border:2px solid #0f9d63; background:#0f9d63; color:#fff; cursor:pointer;">
+          📋 붙여넣기
+        </button>
+        <span id="lyricsSaveState" style="font-size:13px; font-weight:700; color:#8a9490;">&nbsp;</span>
       </div>
       <textarea id="lyricsInput" placeholder="아리랑 아리랑 아라리요&#10;(간주)&#10;아리랑 고개를 넘어간다&#10;나를 버리고 가시는 님은"></textarea>
       <div class="hint">절/후렴 길이가 제각각인 노래는 아래 <b>"타이밍 맞추기"</b>를 꼭 이용하세요.
@@ -336,7 +363,10 @@
         </details>
       </div>
       <div class="hint" style="color:#c0392b; font-weight:700; margin-top:6px;">
-        ⚠️ 입력한 가사는 자동저장되지만(같은 브라우저에서만 유지됨), 캐시를 지우거나 다른 기기로 바꾸면 사라집니다. 꼭 아래 <b>"가사/타이밍 파일로 저장"</b>도 함께 눌러 파일로 백업해두세요.
+        ⚠️ 자동저장은 <b>이 브라우저에만</b> 남습니다. 아래 <b>"가사/타이밍 파일로 저장"</b>도 눌러 백업하세요.
+        <details style="margin-top:4px; font-weight:400;"><summary style="cursor:pointer;">왜 그런가요? (눌러서 보기)</summary>
+        자동저장은 이 브라우저 안에 보관됩니다. 캐시를 지우거나 다른 기기로 바꾸면 사라집니다.
+        </details>
       </div>
 
       <div class="row" style="margin-top:10px;">
@@ -621,8 +651,8 @@
   </div>
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
-    심플 가사 영상 제작기(Simple Lyric Scene Maker)는 무료로 배포하나, 출처 표기를 부탁드립니다.<br>
-    <span id="appVersion" style="opacity:0.7;">v2.0.1 · 2026-08-15 업데이트 (영문 가사 자막이 3~4줄로 늘어날 때 맨 윗줄이 화면 위로 잘리거나 제목 배지에 가려지던 문제 수정 — 줄이 많으면 자동으로 글자 크기를 줄여 화면 안에 들어오도록 함)</span>
+    <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@가사영상" target="_blank" style="color:inherit;">사용법 영상 보기 @가사영상</a><br>
+    <span id="appVersion" style="opacity:0.7;">v2.2.0 · 2026-08-18 업데이트 (이름을 "가사영상"으로 변경 · 가사 붙여넣기 버튼 추가 · 자동저장 표시 추가 · 설명 정리 · <b>카카오톡 등 앱 안 브라우저 감지 후 안내</b>) / v2.0.1 · 2026-08-15 (영문 가사 자막이 3~4줄로 늘어날 때 맨 윗줄이 화면 위로 잘리거나 제목 배지에 가려지던 문제 수정 — 줄이 많으면 자동으로 글자 크기를 줄여 화면 안에 들어오도록 함)</span>
   </div>
 </div>
 
@@ -1630,7 +1660,7 @@ lyricsInput.addEventListener('input', () => {
 });
 
 // =========================================================================
-// 🖱️ 마우스 클릭/드래그로 타이밍 맞추기 (심플 가사 영상 제작기의 기본 타이밍 도구)
+// 🖱️ 마우스 클릭/드래그로 타이밍 맞추기 (가사영상의 기본 타이밍 도구)
 // 클릭/드래그로 찍은 시간은 rebuildLrcFromKnown()을 통해 곧바로 LRC 결과창에 반영됩니다.
 // =========================================================================
 const easyPlayBtn = document.getElementById('easyPlayBtn');
@@ -2158,7 +2188,44 @@ function autosaveNow() {
       lyrics: lyricsInput.value, lrc: lrcResult.value,
       english: englishLyricsInput ? englishLyricsInput.value : '', ts: Date.now()
     }));
+    showLyricsSaved();
   } catch (e) { /* 저장 공간이 없거나 막혀 있어도 조용히 무시(파일 저장으로 대체 가능) */ }
+}
+
+// ── 저장됨 표시 ────────────────────────────────────────────────
+const lyricsSaveState = document.getElementById('lyricsSaveState');
+function showLyricsSaved(msg, color) {
+  if (!lyricsSaveState) return;
+  lyricsSaveState.textContent = msg || '자동 저장됨 ✓';
+  lyricsSaveState.style.color = color || '#0f9d63';
+  clearTimeout(lyricsSaveState._t);
+  lyricsSaveState._t = setTimeout(() => {
+    lyricsSaveState.style.color = '#8a9490';
+  }, 2600);
+}
+
+// ── 📋 붙여넣기 버튼 ───────────────────────────────────────────
+const pasteLyricsBtn = document.getElementById('pasteLyricsBtn');
+if (pasteLyricsBtn) {
+  pasteLyricsBtn.addEventListener('click', async () => {
+    let text = '';
+    try {
+      text = await navigator.clipboard.readText();
+    } catch (e) {
+      showLyricsSaved('브라우저가 막았습니다 — 아래 칸을 길게 눌러 붙여넣기', '#c0392b');
+      lyricsInput.focus();
+      return;
+    }
+    if (!text || !text.trim()) {
+      showLyricsSaved('복사해 둔 글이 없습니다', '#c0392b');
+      return;
+    }
+    if (lyricsInput.value.trim() &&
+        !confirm('이미 입력된 가사가 있습니다.\n복사해 온 내용으로 바꿀까요?')) return;
+    lyricsInput.value = text.trim();
+    lyricsInput.dispatchEvent(new Event('input', { bubbles: true }));
+    showLyricsSaved('붙여넣었습니다 ✓');
+  });
 }
 function scheduleAutosave() {
   clearTimeout(autosaveTimer);
@@ -2827,6 +2894,109 @@ testBtn.addEventListener('click', () => {
 pauseBtn.addEventListener('click', () => currentRender && currentRender.pause());
 resumeBtn.addEventListener('click', () => currentRender && currentRender.resume());
 stopEarlyBtn.addEventListener('click', () => currentRender && currentRender.stopEarly());
+
+
+// =========================================================================
+// 📵 인앱 브라우저(카카오톡·밴드·인스타 등) 감지 + 바깥 브라우저로 안내
+//   이 도구는 canvas.captureStream() + MediaRecorder 로 영상을 만듭니다.
+//   앱 내장 브라우저는 이 기능을 막아두는 경우가 많아 렌더링이 실패합니다.
+//   그래서 들어온 즉시 알려주고, 가능한 기기에서는 바깥 브라우저로 넘겨줍니다.
+// =========================================================================
+(function inAppBrowserGuard() {
+  const UA = navigator.userAgent || '';
+  const url = location.href;
+  const isIOS = /iPhone|iPad|iPod/i.test(UA);
+  const isAndroid = /Android/i.test(UA);
+
+  const apps = [
+    { re: /KAKAOTALK/i,        name: '카카오톡' },
+    { re: /Line\//i,           name: '라인' },
+    { re: /Instagram/i,        name: '인스타그램' },
+    { re: /FBAN|FBAV|FB_IAB/i, name: '페이스북' },
+    { re: /BAND\//i,           name: '밴드' },
+    { re: /NAVER\(inapp/i,     name: '네이버 앱' },
+    { re: /DaumApps/i,         name: '다음 앱' },
+    { re: /everytimeApp/i,     name: '에브리타임' },
+  ];
+  let hit = null;
+  for (const a of apps) if (a.re.test(UA)) { hit = a; break; }
+
+  // 영상 저장 기능이 실제로 있는지도 함께 확인
+  const canRecord = !!(window.MediaRecorder &&
+                       HTMLCanvasElement.prototype.captureStream);
+
+  if (!hit && canRecord) return;   // 정상 브라우저 → 아무것도 안 함
+
+  const box   = document.getElementById('inappWarn');
+  const nameEl= document.getElementById('inappAppName');
+  const btns  = document.getElementById('inappBtns');
+  const help  = document.getElementById('inappHelp');
+  if (!box) return;
+  box.style.display = 'block';
+  if (hit && nameEl) nameEl.textContent = hit.name;
+
+  const btnStyle = 'font-size:15px; font-weight:800; padding:11px 18px; border-radius:9px;' +
+                   'border:2px solid #c0392b; background:#c0392b; color:#fff; cursor:pointer;';
+  const btnStyle2 = btnStyle.replace('background:#c0392b; color:#fff',
+                                     'background:#fff; color:#c0392b');
+
+  function addBtn(label, style, fn) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = label; b.setAttribute('style', style);
+    b.addEventListener('click', fn); btns.appendChild(b); return b;
+  }
+
+  // 주소 복사 (모든 기기 공통 — 가장 확실한 방법)
+  addBtn('📋 주소 복사', btnStyle2, async () => {
+    try { await navigator.clipboard.writeText(url); }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e2) {}
+      document.body.removeChild(ta);
+    }
+    help.innerHTML = '✅ 주소를 복사했습니다.<br>' +
+      (isIOS ? '<b>사파리</b>를 열고 주소창을 <b>길게 눌러 붙여넣기</b> 하세요.'
+             : '<b>크롬</b>을 열고 주소창을 <b>길게 눌러 붙여넣기</b> 하세요.');
+  });
+
+  // 안드로이드 — 바깥 브라우저로 바로 넘기기
+  if (isAndroid) {
+    if (hit && hit.name === '카카오톡') {
+      addBtn('바깥 브라우저로 열기', btnStyle, () => {
+        location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+      });
+    } else {
+      addBtn('크롬으로 열기', btnStyle, () => {
+        location.href = 'intent://' + url.replace(/^https?:\/\//, '') +
+          '#Intent;scheme=https;package=com.android.chrome;end';
+      });
+    }
+  }
+
+  // 아이폰 — 자동 전환이 막혀 있어 손으로 해야 함
+  if (isIOS) {
+    if (hit && hit.name === '카카오톡') {
+      addBtn('바깥 브라우저로 열기(시도)', btnStyle, () => {
+        location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+        setTimeout(() => {
+          help.innerHTML = '안 열렸다면 <b>오른쪽 아래 ⋯ (더보기)</b> → ' +
+                           '<b>"다른 브라우저로 열기"</b> 또는 <b>"Safari로 열기"</b>를 눌러주세요.';
+        }, 1200);
+      });
+    }
+    help.innerHTML = '아이폰은 자동으로 넘어가지 않을 수 있습니다. ' +
+                     '그럴 땐 <b>오른쪽 아래 ⋯ → "Safari로 열기"</b>를 눌러주세요.';
+  }
+
+  if (!hit && !canRecord) {
+    nameEl.textContent = '이 브라우저';
+    help.innerHTML = '이 브라우저는 영상 저장 기능을 지원하지 않습니다. ' +
+                     '<b>크롬</b> 또는 <b>사파리</b> 최신 버전에서 열어주세요.';
+  }
+})();
+
 </script>
 </body>
 </html>
