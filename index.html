@@ -237,10 +237,10 @@
     border-bottom: 1px solid var(--border); cursor: pointer;
   }
   .easy-line-row:last-child { border-bottom: none; }
-  /* 클릭(선택)한 줄: 파란 배경 + 글자색 강조 */
+  /* 클릭(선택)한 줄: 파란 배경 + 글씨색 강조 */
   .easy-line-row.selected { background: rgba(108,139,255,0.18); }
   .easy-line-row.selected .easy-line-text { color: var(--accent); font-weight: 700; }
-  /* 재생 위치가 지금 지나고 있는 줄: 분홍 배경 + 글자색 강조 (실시간으로 따라 이동) */
+  /* 재생 위치가 지금 지나고 있는 줄: 분홍 배경 + 글씨색 강조 (실시간으로 따라 이동) */
   .easy-line-row.now-playing { background: rgba(255,108,160,0.16); }
   .easy-line-row.now-playing .easy-line-text { color: var(--accent2); font-weight: 700; }
   .easy-line-row.current { outline: 1px solid var(--good); }
@@ -304,7 +304,7 @@
   <div id="inappHelp" style="font-size:13px; line-height:1.7; margin-top:10px;"></div>
 </div>
   <h1 class="app-title">🎬 <span class="title-main">가사영상</span><span class="title-sub">사진 + 음악 + 가사 → 영상</span></h1>
-  <div class="sub"><b>음악 하나 + 사진 몇 장 + 가사</b>를 넣으면 자막이 나오는 영상이 됩니다.<br>글자 크기 · 색상 · 글꼴도 마음대로 변경 가능.<br><b style="color:#0f9d63;">설치 없음 · 무료 · 사진과 음원은 내 기기 밖으로 나가지 않습니다.</b><details style="margin-top:6px;"><summary style="cursor:pointer;">자세히 (눌러서 보기)</summary>오디오(MP3·M4A·WAV·AAC·FLAC 등)와 동영상(MP4·MOV 등, 소리만 사용)을 모두 넣을 수 있습니다. 모든 처리는 이 페이지 안에서만 일어나고, 파일이 서버로 전송되지 않습니다.</details></div>
+  <div class="sub"><b>음악 하나 + 사진 몇 장 + 가사</b>를 넣으면 자막이 나오는 영상이 됩니다.<br>글씨 크기 · 색상 · 글꼴도 마음대로 변경 가능.<br><b style="color:#0f9d63;">설치 없음 · 무료 · 사진과 음원은 내 기기 밖으로 나가지 않습니다.</b><details style="margin-top:6px;"><summary style="cursor:pointer;">자세히 (눌러서 보기)</summary>오디오(MP3·M4A·WAV·AAC·FLAC 등)와 동영상(MP4·MOV 등, 소리만 사용)을 모두 넣을 수 있습니다. 모든 처리는 이 페이지 안에서만 일어나고, 파일이 서버로 전송되지 않습니다.</details></div>
 
   <div class="grid">
     <div class="card">
@@ -495,7 +495,7 @@
         </select>
       </div>
       <div>
-        <label>자막 글자 크기</label>
+        <label>자막 글씨 크기</label>
         <input type="number" id="fontSize" value="42" min="16" max="100">
       </div>
       <div>
@@ -539,7 +539,7 @@
         </select>
       </div>
       <div>
-        <label>제목 글자 크기 (0 = 자동)</label>
+        <label>제목 글씨 크기 (0 = 자동)</label>
         <input type="number" id="titleFontSize" value="0" min="0" max="100">
       </div>
       <div>
@@ -593,7 +593,7 @@
         </select>
       </div>
       <div>
-        <label>닉네임 글자 크기 (0 = 자동)</label>
+        <label>닉네임 글씨 크기 (0 = 자동)</label>
         <input type="number" id="nicknameFontSize" value="0" min="0" max="100">
       </div>
       <div>
@@ -625,6 +625,23 @@
 
   <div class="card" style="margin-top:16px;">
     <h2><span class="step-num">6</span>영상 만들기</h2>
+
+    <div style="border:2px solid #0f9d63; border-radius:10px; padding:12px; margin-bottom:12px; background:#f4fbf7;">
+      <div style="font-weight:800; color:#0a6b45; margin-bottom:8px;">① 화면 모양을 먼저 고르세요</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <label id="shapeWideLbl" style="flex:1 1 200px; display:flex; align-items:center; gap:8px; border:2px solid #ccc; border-radius:8px; padding:10px; cursor:pointer; font-weight:700; margin:0; background:#fff;">
+          <input type="radio" name="shapePick" id="shapeWide" value="1280x720" style="width:auto;margin:0;">
+          <span>▭ 가로 &nbsp;<span style="font-weight:400;font-size:13px;color:#666;">유튜브 일반 영상<br>1280 × 720</span></span>
+        </label>
+        <label id="shapeTallLbl" style="flex:1 1 200px; display:flex; align-items:center; gap:8px; border:2px solid #ccc; border-radius:8px; padding:10px; cursor:pointer; font-weight:700; margin:0; background:#fff;">
+          <input type="radio" name="shapePick" id="shapeTall" value="720x1280" style="width:auto;margin:0;">
+          <span>▯ 세로 &nbsp;<span style="font-weight:400;font-size:13px;color:#666;">쇼츠 · 릴스 · 틱톡<br>720 × 1280</span></span>
+        </label>
+      </div>
+      <div id="shapeNow" style="margin-top:10px; font-weight:800; color:#c0392b;"></div>
+    </div>
+
+    <div style="font-weight:800; color:#0a6b45; margin-bottom:6px;">② 만들기</div>
     <button class="secondary" id="testBtn">🔎 처음 10초만 테스트 렌더 (첫 시작 싱크 확인용)</button>
     <div class="hint" style="margin-top:8px;">지금 이 화면을 보고 있는 기기에 맞춰 눌러주세요.</div>
     <div class="mode-btn-row">
@@ -653,7 +670,7 @@
     <video id="previewVideo" controls></video>
     <div id="downloadArea"></div>
     <div class="hint" style="margin-top:10px;">
-      💡 <b>팟플레이어에서 제목/닉네임 글자가 짤리거나 안 보인다면</b> — 팟플레이어의 화면 자르기(꽉찬화면)
+      💡 <b>팟플레이어에서 제목/닉네임 글씨가 짤리거나 안 보인다면</b> — 팟플레이어의 화면 자르기(꽉찬화면)
       설정 때문일 수 있어요. <code>F5(환경설정) → 재생 → 화면</code>에서 <b>비율처리</b>를
       <b>"화면비율유지(권장)"</b>로 바꿔보세요("비율유지 꽉찬화면"으로 되어 있으면 화면 가장자리가
       짤려서 나옵니다).
@@ -665,8 +682,8 @@
   </div>
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
-    <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:inherit;">사용법 영상 보기 @60ai만들기</a><br>
-    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.1 · 2026-08-19 · 문구 정리<br>v2.5.0 · 2026-08-19 · 채널 표시 추가<br>v2.2.0 · 2026-08-18 · 인앱 안내<br>v2.1.0 · 2026-08-18 · 이름 변경<br>v2.0.1 · 2026-08-15 · 자막 짤림 수정</span>
+    <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline;">사용법 영상 보기 @60ai만들기</a><br>
+    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.3 · 2026-08-19 · 가로세로 선택<br>v2.5.2 · 2026-08-19 · 겹침 수정<br>v2.5.0 · 2026-08-19 · 채널 표시 추가<br>v2.2.0 · 2026-08-18 · 인앱 안내<br>v2.1.0 · 2026-08-18 · 이름 변경<br>v2.0.1 · 2026-08-15 · 자막 짤림 수정</span>
   </div>
 </div>
 
@@ -1113,11 +1130,11 @@ function ensureCaptionFontLoaded(fontSize, fontFamily, sampleText) {
   const spec = `bold ${fontSize}px ${fontFamily || captionFontFamily}`;
   // ⚠️ v1.6: document.fonts.load(spec)처럼 두 번째 인자(text) 없이 부르면, 브라우저는 "이 폰트가
   // 쓸 수 있는 상태인지"를 내부 기본 샘플 문자 몇 개로만 확인합니다. 구글 폰트는 파일 하나가
-  // 아니라 실제로 쓰이는 글자에 맞춰 유니코드 범위별로 조각(서브셋)을 나눠서 내려주는데, 숫자
-  // ("(1)"의 "1" 같은 절 번호)처럼 그 기본 샘플에 없는 글자는 "로드 완료"로 착각하고 정작 그 글자가
+  // 아니라 실제로 쓰이는 글씨에 맞춰 유니코드 범위별로 조각(서브셋)을 나눠서 내려주는데, 숫자
+  // ("(1)"의 "1" 같은 절 번호)처럼 그 기본 샘플에 없는 글씨는 "로드 완료"로 착각하고 정작 그 글씨가
   // 속한 조각은 안 받아온 채로 넘어가 버립니다 — 찬송가 가사의 "(1)(2)(3)" 같은 절 번호가 캡션에서
   // 유독 깨진 모양(다른 폰트로 대체됨)으로 나오던 진짜 원인이 이것이었습니다. 실제로 화면에 쓸
-  // 글자를 text로 직접 넘겨서, 그 글자들이 들어있는 조각까지 확실히 받아오도록 합니다.
+  // 글씨를 text로 직접 넘겨서, 그 글씨들이 들어있는 조각까지 확실히 받아오도록 합니다.
   return document.fonts.load(spec, sampleText || undefined).catch(() => {});
 }
 
@@ -1133,15 +1150,15 @@ function hexToRgba(hex, alpha) {
 // 다른 문서(카톡, 워드, PDF 등)에서 가사를 복사-붙여넣기하면 눈에는 안 보이는 폭 0 문자(zero-width
 // space 등)가 줄 안에 섞여 들어오는 경우가 있습니다. trim()은 이런 문자를 지우지 못해서, "화면엔
 // 빈 줄처럼 보이는데 실제로는 문자가 있는 줄"이 그대로 진짜 가사 줄로 취급되어 버립니다 — 그 줄은
-// 시간을 찍어도 목록에 글자가 안 보이고, 영상에는 보이지 않는 이상한 자막 한 줄이 끼어드는 원인이
+// 시간을 찍어도 목록에 글씨가 안 보이고, 영상에는 보이지 않는 이상한 자막 한 줄이 끼어드는 원인이
 // 됩니다. 그래서 줄 단위로 다룰 때는 항상 이 함수로 먼저 폭 0 문자를 지우고 다룹니다.
 function stripInvisible(s) {
   // \u200B \u200C \u200D \uFEFF \u2060 \u00A0 \u2028 \u2029 \u00AD \u3164 \uFFA0 \uFFFC
   // 와 같은 눈에 안 보이는 폭 0/비정상 공백 문자를 지웁니다.
   // \u3164(한글 채움 문자)/\uFFA0(반각 한글 채움 문자)는 아래아한글(HWP)이나 일부 문서
-  // 편집기가 줄 간격을 맞추려고 몰래 넣는 "보이지 않는 한글 한 글자"로, 찬송가 가사를
+  // 편집기가 줄 간격을 맞추려고 몰래 넣는 "보이지 않는 한글 한 글씨"로, 찬송가 가사를
   // HWP/워드에서 복사해 붙여넣을 때 특히 자주 섞여 들어옵니다 — 남아있으면 trim()으로도 안
-  // 지워져서 "화면엔 빈 줄처럼 보이는데 실제로는 글자가 있는 줄"이 진짜 가사 줄로 잘못
+  // 지워져서 "화면엔 빈 줄처럼 보이는데 실제로는 글씨가 있는 줄"이 진짜 가사 줄로 잘못
   // 취급됩니다.
   return (s || '').replace(/[\u200B\u200C\u200D\uFEFF\u2060\u00A0\u2028\u2029\u00AD\u3164\uFFA0\uFFFC]/g, '');
 }
@@ -1171,19 +1188,21 @@ function splitLyricsLines(text) {
   return (text || '').split('\n').map(l => stripInvisible(l).trim()).filter(Boolean);
 }
 
-// "(간주)" 한 줄만 정확히 입력하면 그 구간에서는 화면에 자막 글자가 나오지 않습니다
+// "(간주)" 한 줄만 정확히 입력하면 그 구간에서는 화면에 자막 글씨가 나오지 않습니다
 // (전주/간주처럼 가사가 없는 구간의 타이밍 표시용 — 타이밍은 다른 줄처럼 그대로 맞추면 됩니다).
 function isInterludeMarker(text) {
   return stripInvisible(text || '').trim() === '(간주)';
 }
 
+// v2.5.2: 채널 표시(@60ai만들기)가 켜져 있으면 자막을 살짝 위로 올려 겹치지 않게 합니다.
+let CAPTION_EXTRA_BOTTOM = 0;
 function drawCaption(ctx, text, w, h, fontSize) {
   const maxWidth = w * 0.86;
-  const bottomMargin = h * 0.11;
+  const bottomMargin = h * 0.11 + (CAPTION_EXTRA_BOTTOM || 0);
   // v2.0.1: 영문 가사가 붙으면 자막이 2줄→3~4줄로 늘어날 수 있는데, 아래(bottomMargin) 기준으로만
   // 위치를 잡다 보니 줄이 많을 때 맨 윗줄이 화면 위로 짤리거나 제목 배지와 겹쳐 안 보이는 문제가
   // 있었습니다(실제 렌더링 영상을 프레임 단위로 확인해서 발견 — 한/영 텍스트 매칭 자체는 문제 없었음).
-  // 맨 윗줄이 제목 배지 아래 안전 영역보다 위로 올라가면, 안전 영역 안에 들어올 때까지 글자 크기를
+  // 맨 윗줄이 제목 배지 아래 안전 영역보다 위로 올라가면, 안전 영역 안에 들어올 때까지 글씨 크기를
   // 조금씩 줄입니다(최대 40%까지만 줄이고, 그래도 안 맞으면 그 상태로 그대로 그립니다).
   const safeTopY = h * 0.20;
   let size = fontSize;
@@ -1193,7 +1212,7 @@ function drawCaption(ctx, text, w, h, fontSize) {
     lines = wrapText(ctx, text, maxWidth);
     lineHeight = size * 1.35;
     startY = h - bottomMargin - (lines.length - 1) * lineHeight;
-    const topY = startY - lineHeight * 0.78; // 맨 윗줄 글자의 대략적인 위쪽 경계(ascender 포함)
+    const topY = startY - lineHeight * 0.78; // 맨 윗줄 글씨의 대략적인 위쪽 경계(ascender 포함)
     if (topY >= safeTopY || size <= fontSize * 0.6) break;
     size -= 2;
   }
@@ -1226,7 +1245,7 @@ function drawBadge(ctx, text, w, h, position, fontSize, opts) {
   const fontFamily = opts.fontFamily || captionFontFamily;
   const boxColor = opts.boxColor || 'rgba(10,20,45,0.6)';
   const textColor = opts.textColor || '#ffffff';
-  // 글자 크기를 화면 크기에 비례하게 자동 조정(고정 22px이면 모바일처럼 해상도를 낮춰
+  // 글씨 크기를 화면 크기에 비례하게 자동 조정(고정 22px이면 모바일처럼 해상도를 낮춰
   // 렌더링할 때 상대적으로 너무 크게 나와 화면을 가리는 문제가 있었습니다). 0(자동)이 아니면
   // 사용자가 지정한 크기를 그대로 씁니다.
   if (!fontSize) fontSize = Math.max(20, Math.round(Math.min(w, h) * 0.045));
@@ -1333,7 +1352,7 @@ function fmtLrcTime(sec) {
 }
 
 // 줄 목록 화면 표시용 — 실제 저장/렌더링에 쓰이는 값(fmtLrcTime, 소수점 포함)은 그대로 정밀하게
-// 유지하고, 목록에 보이는 글자만 초 단위까지만 짧게 표시합니다 (00:12.40 → 00:12).
+// 유지하고, 목록에 보이는 글씨만 초 단위까지만 짧게 표시합니다 (00:12.40 → 00:12).
 function fmtDisplaySec(sec) {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
@@ -2451,9 +2470,9 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   const crossfade = parseFloat(crossfadeInput.value) || 0;
   const selectedEffects = Array.from(document.querySelectorAll('.fxCheck:checked')).map(el => el.value);
   // ⚠️ v1.4: 실제 PC 렌더링 결과 화면을 확대해서 보니, 제목 배지에 "하나님의 진리등대" 뒤로 낯선
-  // "v" 모양 글자가 하나 더 붙어 나오는 게 발견됐습니다. 가사 줄과 달리 제목/닉네임 입력칸은
+  // "v" 모양 글씨가 하나 더 붙어 나오는 게 발견됐습니다. 가사 줄과 달리 제목/닉네임 입력칸은
   // stripInvisible() 없이 trim()만 하고 있었던 게 원인 — 자막 쪽(HWP 채움 문자 등)과 똑같이, 폭
-  // 0이어야 할 보이지 않는 문자가 제목/닉네임에도 섞여 들어오면 그 글자만 지금 쓰는 폰트(Jua 등)에
+  // 0이어야 할 보이지 않는 문자가 제목/닉네임에도 섞여 들어오면 그 글씨만 지금 쓰는 폰트(Jua 등)에
   // 없는 문자라 브라우저가 다른 폰트로 대체해서 그리는데, 그 대체 폰트가 이 문자를 폭 0이 아니라
   // 눈에 보이는 모양(이 "v")으로 그려버린 것으로 보입니다. "폰트가 섞여 나온다"고 느껴진 원인이
   // 배지 쪽엔 사실 이거였을 가능성이 높습니다. 자막처럼 제목/닉네임도 stripInvisible()을 거치도록
@@ -2478,7 +2497,9 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   const channelMarkChk = document.getElementById('channelMarkChk');
   const channelMarkOn = channelMarkChk ? !channelMarkChk.checked : true;
   const CHANNEL_MARK = '@60ai만들기';
-  // 실제로 쓸 글자(가사 전체 + 영문 가사(있으면) + 제목 + 닉네임 + 절 번호 등에 흔히 쓰이는
+  // 채널 표시가 켜져 있으면 자막을 화면 높이의 4%만큼 위로 올려 겹침을 막습니다.
+  CAPTION_EXTRA_BOTTOM = channelMarkOn ? Math.round(h * 0.04) : 0;
+  // 실제로 쓸 글씨(가사 전체 + 영문 가사(있으면) + 제목 + 닉네임 + 절 번호 등에 흔히 쓰이는
   // 숫자/괄호/기호)를 전부 모아서 넘깁니다 — 위 ensureCaptionFontLoaded 설명 참고. v2.0에서 영문
   // 가사가 추가됐으므로, 영문 알파벳 글리프도 같은 방식으로 미리 확실히 로드되도록 포함시킵니다.
   const fullSampleText = (
@@ -2643,7 +2664,7 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   ]);
 
   // ⚡ 성능 캐싱: 제목/닉네임 배지는 렌더링 내내 내용이 바뀌지 않는데도 예전엔 매 프레임(초당 30번)
-  // 다시 그렸습니다. 글자폭 측정(measureText)·둥근 박스(roundRect)·테두리 그리기 같은 캔버스 작업은
+  // 다시 그렸습니다. 글씨폭 측정(measureText)·둥근 박스(roundRect)·테두리 그리기 같은 캔버스 작업은
   // 꽤 무거워서, 특히 저사양 모바일 기기에서 이 작업이 매 프레임 반복되면 정작 화면을 다시 그리는
   // 속도(requestAnimationFrame 호출 빈도)가 크게 느려지고, 이게 녹화 영상이 버벅이거나 멈춘 것처럼
   // 보이는("프리징") 핵심 원인이 됩니다. 배지는 딱 한 번만 미리 그려서 캐싱해두고, 매 프레임에는
@@ -2660,7 +2681,7 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   // 채널 표시 — 화면 높이의 약 2.5% 크기로 좌측 아래에. 닉네임(기본 우측 아래)과 겹치지 않는 자리입니다.
   if (channelMarkOn) {
     const markPos = (nicknamePos === 'bl') ? 'br' : 'bl';
-    drawBadge(badgeCtx, CHANNEL_MARK, w, h, markPos, Math.max(14, Math.round(h * 0.025)), {
+    drawBadge(badgeCtx, CHANNEL_MARK, w, h, markPos, Math.max(12, Math.round(h * 0.022)), {
       fontFamily: nicknameFontChoice.family,
       boxColor: 'rgba(0,0,0,0.30)',
       textColor: 'rgba(255,255,255,0.85)'
@@ -3085,6 +3106,42 @@ stopEarlyBtn.addEventListener('click', () => currentRender && currentRender.stop
     // 화면에 보이는 순서대로 1, 2, 3... 다시 매깁니다.
     var nums = document.querySelectorAll('.step-num');
     for (var i = 0; i < nums.length; i++) nums[i].textContent = String(i + 1);
+  } catch (e) {}
+})();
+</script>
+
+<script>
+// =========================================================================
+// v2.5.3 — "무엇으로 만들어지는지" 를 6번 칸에서 바로 보이게 합니다.
+// 옵션 칸 깊숙이 있던 가로/세로 선택을 큰 버튼으로 올리고, 누르기 직전에 현재 설정을 크게 보여줍니다.
+// =========================================================================
+(function shapePickerSetup() {
+  try {
+    var sel   = document.getElementById('ratioSelect');
+    var wide  = document.getElementById('shapeWide');
+    var tall  = document.getElementById('shapeTall');
+    var now   = document.getElementById('shapeNow');
+    var wideL = document.getElementById('shapeWideLbl');
+    var tallL = document.getElementById('shapeTallLbl');
+    if (!sel || !wide || !tall || !now) return;
+
+    function paint() {
+      var v = sel.value;
+      var isTall = (v === '720x1280');
+      wide.checked = !isTall;
+      tall.checked = isTall;
+      wideL.style.borderColor = isTall ? '#ccc' : '#0f9d63';
+      wideL.style.background  = isTall ? '#fff' : '#eaf7f0';
+      tallL.style.borderColor = isTall ? '#0f9d63' : '#ccc';
+      tallL.style.background  = isTall ? '#eaf7f0' : '#fff';
+      now.textContent = isTall
+        ? '지금 설정 : 세로 (쇼츠용) 720 × 1280'
+        : '지금 설정 : 가로 (유튜브 일반) 1280 × 720';
+    }
+    wide.addEventListener('change', function () { sel.value = '1280x720'; sel.dispatchEvent(new Event('change')); paint(); });
+    tall.addEventListener('change', function () { sel.value = '720x1280'; sel.dispatchEvent(new Event('change')); paint(); });
+    sel.addEventListener('change', paint);
+    paint();
   } catch (e) {}
 })();
 </script>
