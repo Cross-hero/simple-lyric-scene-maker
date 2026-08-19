@@ -677,10 +677,10 @@
     <video id="previewVideo" controls></video>
     <div id="downloadArea"></div>
     <div class="hint" style="margin-top:10px;">
-      💡 <b>팟플레이어에서 제목/닉네임 글씨가 짤리거나 안 보인다면</b> — 팟플레이어의 화면 자르기(꽉찬화면)
+      💡 <b>팟플레이어에서 제목/닉네임 글씨가 잘리거나 안 보인다면</b> — 팟플레이어의 화면 자르기(꽉찬화면)
       설정 때문일 수 있어요. <code>F5(환경설정) → 재생 → 화면</code>에서 <b>비율처리</b>를
       <b>"화면비율유지(권장)"</b>로 바꿔보세요("비율유지 꽉찬화면"으로 되어 있으면 화면 가장자리가
-      짤려서 나옵니다).
+      잘려서 나옵니다).
     </div>
   </div>
 
@@ -690,7 +690,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline;">사용법 영상 보기 @60ai만들기</a><br>
-    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.4 · 2026-08-19 · 글꼴 멈춤 수정<br>v2.5.3 · 2026-08-19 · 가로세로 선택<br>v2.5.2 · 2026-08-19 · 겹침 수정<br>v2.5.0 · 2026-08-19 · 채널 표시 추가<br>v2.2.0 · 2026-08-18 · 인앱 안내<br>v2.1.0 · 2026-08-18 · 이름 변경<br>v2.0.1 · 2026-08-15 · 자막 짤림 수정</span>
+    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
   </div>
 </div>
 
@@ -1207,7 +1207,7 @@ function drawCaption(ctx, text, w, h, fontSize) {
   const maxWidth = w * 0.86;
   const bottomMargin = h * 0.11 + (CAPTION_EXTRA_BOTTOM || 0);
   // v2.0.1: 영문 가사가 붙으면 자막이 2줄→3~4줄로 늘어날 수 있는데, 아래(bottomMargin) 기준으로만
-  // 위치를 잡다 보니 줄이 많을 때 맨 윗줄이 화면 위로 짤리거나 제목 배지와 겹쳐 안 보이는 문제가
+  // 위치를 잡다 보니 줄이 많을 때 맨 윗줄이 화면 위로 잘리거나 제목 배지와 겹쳐 안 보이는 문제가
   // 있었습니다(실제 렌더링 영상을 프레임 단위로 확인해서 발견 — 한/영 텍스트 매칭 자체는 문제 없었음).
   // 맨 윗줄이 제목 배지 아래 안전 영역보다 위로 올라가면, 안전 영역 안에 들어올 때까지 글씨 크기를
   // 조금씩 줄입니다(최대 40%까지만 줄이고, 그래도 안 맞으면 그 상태로 그대로 그립니다).
