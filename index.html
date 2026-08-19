@@ -641,6 +641,13 @@
       <div id="shapeNow" style="margin-top:10px; font-weight:800; color:#c0392b;"></div>
     </div>
 
+    <div class="hint" style="margin-top:8px; background:#fff8e6; border:1px solid #f0d79b; padding:10px; border-radius:8px; line-height:1.7;">
+      🔄 <b>중간에 멈춰서 새로고침해야 할 때</b> — 겁내지 않으셔도 됩니다.<br>
+      <b>가사와 타이밍은 이 브라우저에 자동 저장</b>되어 있어, 새로고침 뒤 "불러올까요?" 물음에 <b>확인</b>만 누르면 그대로 돌아옵니다.<br>
+      <b style="color:#c0392b;">다시 골라야 하는 것은 음원 파일과 사진뿐입니다</b> (브라우저 보안상 파일은 자동으로 다시 열 수 없습니다).<br>
+      더 확실히 해두려면 위 1번 칸의 <b>"가사/타이밍 파일로 저장"</b>을 눌러 파일로 백업해두세요.
+    </div>
+
     <div style="font-weight:800; color:#0a6b45; margin-bottom:6px;">② 만들기</div>
     <button class="secondary" id="testBtn">🔎 처음 10초만 테스트 렌더 (첫 시작 싱크 확인용)</button>
     <div class="hint" style="margin-top:8px;">지금 이 화면을 보고 있는 기기에 맞춰 눌러주세요.</div>
@@ -683,7 +690,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline;">사용법 영상 보기 @60ai만들기</a><br>
-    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.3 · 2026-08-19 · 가로세로 선택<br>v2.5.2 · 2026-08-19 · 겹침 수정<br>v2.5.0 · 2026-08-19 · 채널 표시 추가<br>v2.2.0 · 2026-08-18 · 인앱 안내<br>v2.1.0 · 2026-08-18 · 이름 변경<br>v2.0.1 · 2026-08-15 · 자막 짤림 수정</span>
+    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.4 · 2026-08-19 · 글꼴 멈춤 수정<br>v2.5.3 · 2026-08-19 · 가로세로 선택<br>v2.5.2 · 2026-08-19 · 겹침 수정<br>v2.5.0 · 2026-08-19 · 채널 표시 추가<br>v2.2.0 · 2026-08-18 · 인앱 안내<br>v2.1.0 · 2026-08-18 · 이름 변경<br>v2.0.1 · 2026-08-15 · 자막 짤림 수정</span>
   </div>
 </div>
 
@@ -2507,9 +2514,11 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
     document.getElementById('titleText').value + ' ' +
     document.getElementById('nicknameText').value + ' @60ai만들기 0123456789().,!?~-·ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
   ).slice(0, 4000);
-  await ensureCaptionFontLoaded(fontSize, null, fullSampleText);
-  await ensureCaptionFontLoaded(titleFontSize || 22, titleFontChoice.family, fullSampleText);
-  await ensureCaptionFontLoaded(nicknameFontSize || 22, nicknameFontChoice.family, fullSampleText);
+  // ⚠️ v2.5.4: 아이폰 사파리에서 이 세 줄 중 하나가 영영 안 끝나 "준비 중 1/4 · 글꼴 준비"에서
+  // 멈추는 일이 있었습니다. 글꼴은 못 받아와도 기본 글꼴로 나올 뿐이므로, 6초까지만 기다리고 넘어갑니다.
+  try { await withTimeout(ensureCaptionFontLoaded(fontSize, null, fullSampleText), 6000, '자막 글꼴'); } catch (e) {}
+  try { await withTimeout(ensureCaptionFontLoaded(titleFontSize || 22, titleFontChoice.family, fullSampleText), 6000, '제목 글꼴'); } catch (e) {}
+  try { await withTimeout(ensureCaptionFontLoaded(nicknameFontSize || 22, nicknameFontChoice.family, fullSampleText), 6000, '닉네임 글꼴'); } catch (e) {}
   // 위 3개는 "이 폰트 하나"가 준비됐는지만 확인합니다. 배지/자막을 매 프레임 다시 그리던 예전에는
   // 혹시 폰트가 조금 늦게 준비돼도 다음 프레임에서 자동으로 맞는 폰트로 다시 그려져 티가 안 났지만,
   // v1.1부터 배지/자막을 한 번만 그려서 캐싱하다 보니, 그 "한 번"이 폰트 준비보다 아주 조금이라도
