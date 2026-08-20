@@ -310,7 +310,8 @@
     <div class="card">
       <h2><span class="step-num">1</span>음원 넣기</h2>
       <label>음원 파일 선택</label>
-      <input type="file" id="audioInput" accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.flac,.wma,.mp4,.mov,.m4v,.3gp,.webm">
+      <input type="file" id="audioInput">
+      <div class="filelist" id="audioMsg">선택된 음원 없음</div>
       <div class="hint"><b>동영상을 골라도 소리만 씁니다.</b> 본인이 사용 권한을 가진 음원만 사용하세요.<details style="margin-top:4px;"><summary style="cursor:pointer;">넣을 수 있는 파일 (눌러서 보기)</summary>MP3·M4A·WAV·AAC·FLAC 등 오디오 파일과, MP4·MOV 등 동영상 파일(화면은 무시하고 소리만 사용).</details>
         <details style="margin-top:4px;"><summary style="cursor:pointer; color:#c0392b; font-weight:700;">💡 팁 — 파일이 목록에 안 보이나요? (눌러서 보기)</summary>
         아이폰/갤럭시에서 구글 드라이브·카카오톡·"내 파일"에 저장한 파일이 선택 화면에 안 보인다면, 보통 파일 형식 필터가 아니라 <b>선택 화면에서 그 위치(구글 드라이브 등)로 직접 들어가지 않아서</b>인 경우가 많습니다.<br>
@@ -324,7 +325,7 @@
     <div class="card">
       <h2><span class="step-num">2</span>배경 사진 (최대 20장)</h2>
       <label>사진 파일 선택 (여러 장 선택 가능, 최대 20장)</label>
-      <input type="file" id="imagesInput" accept="image/*" multiple>
+      <input type="file" id="imagesInput" multiple>
       <div class="filelist" id="imgList">선택된 사진 없음</div>
     </div>
   </div>
@@ -375,7 +376,7 @@
         </div>
         <div>
           <button class="secondary" id="loadLyricsBtn" style="width:100%;">📂 저장한 파일 불러오기</button>
-          <input type="file" id="loadLyricsFile" accept=".txt" style="display:none;">
+          <input type="file" id="loadLyricsFile" style="display:none;">
         </div>
       </div>
       <div class="hint">⚠️ 새로고침하면 입력한 내용이 사라지니, 작업 중간중간 <b>"저장"</b>을 눌러 백업하세요.
@@ -690,7 +691,7 @@
 
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     <b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다. · <a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline;">사용법 영상 보기 @60ai만들기</a><br>
-    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
+    <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:6px;">v2.6.0 · 2026-08-20 · 갤럭시 파일 선택 문제 해결 (형식 제한 없앰)<br>v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
   </div>
 </div>
 
@@ -867,6 +868,12 @@ imagesInput.addEventListener('change', () => {
   } else {
     imgList.textContent = files.length ? `선택됨(${files.length}장): ${files.map(f => f.name).join(', ')}` : '선택된 사진 없음';
     imgList.style.color = '';
+  }
+  // v2.6.0: 사진이 아닌 파일이 섞였으면 안내 (막지는 않음)
+  const bad = files.filter(f => { const e = fileExt(f.name); return e && IMAGE_EXTS.indexOf(e) < 0; });
+  if (bad.length) {
+    imgList.innerHTML = '⚠️ 사진이 아닌 것 같은 파일이 ' + bad.length + '개 있습니다: <b>' + bad.map(f => f.name).join(', ') + '</b><br>그래도 진행은 되지만, 화면이 비어 보이면 다른 파일로 골라보세요.<br>선택됨(' + files.length + '장)';
+    imgList.style.color = 'var(--warn)';
   }
 });
 
@@ -2136,7 +2143,33 @@ function highlightCurrentLine() {
 timelineZoomIn.addEventListener('click', () => { easyPps = Math.min(200, easyPps + 15); renderTimeline(); });
 timelineZoomOut.addEventListener('click', () => { easyPps = Math.max(15, easyPps - 15); renderTimeline(); });
 
+// ---- v2.6.0: 파일 형식 제한(accept)을 없앤 대신, 고른 뒤에 여기서 검사합니다 ----
+// 갤럭시(안드로이드)에서 구글 드라이브·카카오톡으로 받은 음원이 "회색으로 잠겨" 선택조차
+// 안 되는 문제가 있었습니다. 원인은 파일 선택 칸의 형식 제한이었습니다. 그래서 제한을 없애
+// 무엇이든 고를 수 있게 하고, 고른 다음 확장자를 보고 안내만 합니다. 막지는 않습니다 —
+// 일부 기기는 확장자나 형식 정보를 아예 안 넘겨주기 때문입니다.
+const AUDIO_EXTS = ['mp3','m4a','aac','wav','ogg','oga','flac','wma','aiff','aif','opus','mp4','mov','m4v','3gp','webm','mkv','avi'];
+const IMAGE_EXTS = ['jpg','jpeg','png','gif','webp','bmp','heic','heif','tif','tiff','avif'];
+const TEXT_EXTS  = ['txt','lrc','srt','text','md'];
+function fileExt(name){ const i = String(name||'').lastIndexOf('.'); return i < 0 ? '' : name.slice(i+1).toLowerCase(); }
+function checkPickedFile(file, exts, kind){
+  const ext = fileExt(file && file.name);
+  if (!ext) return { ok:true, msg:'' };            // 확장자를 모르면 통과 (기기가 안 알려주는 경우)
+  if (exts.indexOf(ext) >= 0) return { ok:true, msg:'' };
+  return { ok:false, msg:'⚠️ <b>.' + ext + '</b> 파일을 고르셨습니다. ' + kind + ' 파일이 아닌 것 같습니다. 그래도 진행은 되지만, 안 되면 다른 파일로 다시 골라보세요.' };
+}
+
 audioInput.addEventListener('change', () => {
+  const _am = document.getElementById('audioMsg');
+  const _af = audioInput.files[0];
+  if (_am) {
+    if (!_af) { _am.textContent = '선택된 음원 없음'; _am.style.color = ''; }
+    else {
+      const r = checkPickedFile(_af, AUDIO_EXTS, '음악·동영상');
+      if (r.ok) { _am.textContent = '선택됨: ' + _af.name; _am.style.color = ''; }
+      else { _am.innerHTML = r.msg + '<br>선택됨: ' + _af.name; _am.style.color = 'var(--warn)'; }
+    }
+  }
   easyDuration = 0;
   if (easyAudio) { easyAudio.pause(); }
   easyAudio = null;
@@ -2344,6 +2377,13 @@ loadLyricsBtn.addEventListener('click', () => loadLyricsFile.click());
 loadLyricsFile.addEventListener('change', async () => {
   const file = loadLyricsFile.files[0];
   if (!file) return;
+  // v2.6.0: .txt 제한을 없앴으므로 여기서 확인
+  const _ext = fileExt(file.name);
+  if (_ext && TEXT_EXTS.indexOf(_ext) < 0) {
+    loadLyricsFile.value = '';
+    alert('글자 파일이 아닌 것 같습니다 (.' + _ext + ').\n가사는 .txt 또는 .lrc 파일로 골라주세요.');
+    return;
+  }
   const text = await file.text();
   loadTextIntoBoxes(text);
   loadLyricsFile.value = '';
