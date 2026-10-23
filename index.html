@@ -716,10 +716,10 @@
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     <div><b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다.</div>
     <div style="margin-top:6px;"><a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline; white-space:nowrap;">사용법 영상 보기 @60ai만들기</a></div>
-    <div style="opacity:0.8; margin-top:6px;">v2.8.3 · 2026-10-23</div>
+    <div style="opacity:0.8; margin-top:6px;">v2.8.4 · 2026-10-23</div>
     <details id="verBox" style="margin-top:6px;">
       <summary style="cursor:pointer; color:#0f9d63; font-weight:700; list-style:none;">수정 이력 보기</summary>
-      <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:8px; line-height:1.9;">v2.8.3 · 2026-10-23 · 단계 안내문을 한 줄로 · 4단계 제목을 짧게 · 화살표를 수정 이력과 같은 방식(▶ ▼)으로 통일<br>v2.8.2 · 2026-10-23 · 수정 이력을 접었다 펴는 방식으로 (화면이 길어지지 않게)<br>v2.8.1 · 2026-10-22 · 줄을 누르면 재생이 처음으로 되돌아가던 것 수정 · 폰에서 가사를 아래 한 줄로 내리고 「▶ 이동」을 오른쪽 끝으로<br>v2.8.0 · 2026-10-22 · 폰에서 줄 목록을 눌러도 시간이 안 찍히던 것 수정 · 사진을 여러 번 나눠 고를 수 있게 함 · 「대기 중」에 안내 문구 붙임<br>v2.7.1 · 2026-10-19 · 2·3단계를 누르면 화면이 지나치던 것 수정<br>v2.7.0 · 2026-10-19 · 6단계를 접었다 펴는 방식으로 — 화면 길이 70% 줄임<br>v2.6.0 · 2026-08-20 · 갤럭시 파일 선택 문제 해결 (형식 제한 없앰)<br>v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
+      <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:8px; line-height:1.9;">v2.8.4 · 2026-10-23 · 펼친 단계 맨 아래에 「▲ 이 단계 접기」 버튼 추가 (끝까지 내려간 자리에서 바로 접힘)<br>v2.8.3 · 2026-10-23 · 단계 안내문을 한 줄로 · 4단계 제목을 짧게 · 화살표를 수정 이력과 같은 방식(▶ ▼)으로 통일<br>v2.8.2 · 2026-10-23 · 수정 이력을 접었다 펴는 방식으로 (화면이 길어지지 않게)<br>v2.8.1 · 2026-10-22 · 줄을 누르면 재생이 처음으로 되돌아가던 것 수정 · 폰에서 가사를 아래 한 줄로 내리고 「▶ 이동」을 오른쪽 끝으로<br>v2.8.0 · 2026-10-22 · 폰에서 줄 목록을 눌러도 시간이 안 찍히던 것 수정 · 사진을 여러 번 나눠 고를 수 있게 함 · 「대기 중」에 안내 문구 붙임<br>v2.7.1 · 2026-10-19 · 2·3단계를 누르면 화면이 지나치던 것 수정<br>v2.7.0 · 2026-10-19 · 6단계를 접었다 펴는 방식으로 — 화면 길이 70% 줄임<br>v2.6.0 · 2026-08-20 · 갤럭시 파일 선택 문제 해결 (형식 제한 없앰)<br>v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
     </details>
   </div>
 </div>
@@ -3241,6 +3241,11 @@ stopEarlyBtn.addEventListener('click', () => currentRender && currentRender.stop
                                  transition:transform .25s ease}
   /* v2.8.3 — 바닥 「수정 이력」과 같은 방식으로 맞춘다. 돌리지 않고 ▶ ↔ ▼ 글자를 바꾼다 */
   .badge{white-space:nowrap}
+  /* v2.8.4 — 펼친 단계 맨 아래의 「접기」 버튼 */
+  .sec-close{display:block;width:100%;margin:18px 0 0;padding:13px 0;
+             background:#f0fdf4;border:1px solid #bfe3cd;border-radius:10px;
+             color:#0f7a4a;font-weight:700;font-size:16px;cursor:pointer}
+  .sec-close:hover{background:#e2f7ea}
   .sec-body{overflow:hidden;transition:height .28s ease, opacity .28s ease;opacity:1}
   .sec-body.sec-shut{height:0;opacity:0;visibility:hidden}
   .card{transition:box-shadow .25s ease}
@@ -3303,6 +3308,24 @@ stopEarlyBtn.addEventListener('click', () => currentRender && currentRender.stop
         s.body.style.height='';
       }, DUR);
     }
+    // v2.8.4 — 펼친 단계를 「끝까지 내려간 자리에서 바로」 접을 수 있게 한다.
+    // 전에는 접으려면 제목까지 다시 올라와야 했다.
+    secs.forEach(function(s){
+      var cb=document.createElement('button');
+      cb.type='button'; cb.className='sec-close';
+      cb.textContent='▲ 이 단계 접기';
+      cb.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        collapse(s);
+        setTimeout(function(){
+          var top = s.head.getBoundingClientRect().top + window.pageYOffset - 8;
+          var max = document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({top: Math.max(0, Math.min(top, max)), behavior:'smooth'});
+        }, DUR + 40);
+      });
+      s.body.appendChild(cb);
+    });
+
     secs.forEach(function(s,i){
       s.head.addEventListener('click', function(){
         if(s.open){ collapse(s); return; }          // 열린 것을 누르면 접힌다
@@ -3338,7 +3361,7 @@ stopEarlyBtn.addEventListener('click', () => currentRender && currentRender.stop
     window.openSectionOf = function(el){ var s=secOf(el); if(s&&!s.open) expand(s); };
 
     var tip=document.createElement('div'); tip.id='secTip';
-    tip.innerHTML='📂 <b>단계 제목을 누르면 그 단계만 펼쳐집니다.</b>';
+    tip.innerHTML='📂 <b>단계 제목을 누르면 펼쳐지고, 다시 누르면 접힙니다.</b>';
     secs[0].card.parentNode.insertBefore(tip, secs[0].card);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',build);
