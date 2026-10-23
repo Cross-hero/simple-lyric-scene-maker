@@ -365,9 +365,9 @@
         </details>
       </div>
       <div class="hint" style="color:#c0392b; font-weight:700; margin-top:6px;">
-        ⚠️ 전주·간주 자리에는 <code>(간주)</code> 한 줄을 넣으세요.
+        ⚠️ 전주·간주 자리에는 <code>전주</code> 또는 <code>간주</code> 한 줄을 넣으세요 (괄호는 있어도 없어도 됩니다).
         <details style="margin-top:4px; font-weight:400;"><summary style="cursor:pointer;">왜 필요한가요? (눌러서 보기)</summary>
-        <code>(간주)</code> 줄은 화면에 자막이 뜨지 않고 타이밍 표시용으로만 쓰입니다.
+        <code>전주 · 간주 · 후주 · 연주</code> 줄은 <b>화면에 자막이 뜨지 않고</b> 타이밍 표시용으로만 쓰입니다.
         타이밍을 다 맞춘 뒤에 중간에 끼워 넣으면 그 뒤 줄들의 타이밍이 초기화되니,
         <u>타이밍 맞추기 전에 미리 넣어두세요.</u>
         </details>
@@ -432,7 +432,19 @@
         따로 탭할 필요는 없습니다. 후렴처럼 같은 한국어 줄이 여러 번 나오면, 영문도 같은 횟수만큼
         같은 순서로 적어주세요. 비워두면 지금처럼 한국어만 나옵니다.
       </div>
+      <div class="row" style="margin:8px 0 6px; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button type="button" id="pasteEnglishBtn"
+          style="flex:0 0 auto; font-size:16px; font-weight:800; padding:12px 16px; border-radius:10px;
+                 border:2px solid #0f9d63; background:#0f9d63; color:#fff; cursor:pointer;">
+          📥 영문 가사 붙여넣기
+        </button>
+        <span id="englishSaveState" style="font-size:13px; font-weight:700; color:#8a9490;">&nbsp;</span>
+      </div>
       <textarea id="englishLyricsInput" placeholder="Arirang, Arirang, Arariyo&#10;Crossing over Arirang Pass"></textarea>
+      <div class="hint">한 줄에 한 소절 — <b>한국어와 줄 순서를 똑같이</b> 맞추세요. 타이밍은 따로 맞출 필요 없습니다.<br>
+        <span id="enCount" style="font-weight:700;"></span>
+        <span style="color:var(--muted);">※ 「전주·간주」와 <code>```</code> 같은 줄은 양쪽에서 자동으로 빼고 셉니다.</span>
+      </div>
 
       <label style="margin-top:14px;">정확한 타이밍 결과 (LRC) — 타이밍 맞추기를 하면 자동 채워집니다. 직접 수정도 가능하고, 이미 있는 LRC 파일 내용을 여기에 붙여넣어도 됩니다.</label>
       <textarea id="lrcResult" placeholder="[00:12.50]아리랑 아리랑 아라리요&#10;[00:16.30]아리랑 고개를 넘어간다"></textarea>
@@ -489,8 +501,30 @@
   <div class="card" style="margin-top:16px;" id="easyTimingCard">
     <h2><span class="step-num">4</span>가사 타이밍 맞추기 <span class="badge">추천</span></h2>
     <div class="hint" style="background:#eaf7f0; border:1px solid #bfe3cd; padding:10px; border-radius:8px; line-height:1.7;">
-      ⏱️ <b>① 재생 → ② 지금 나오는 가사 줄 클릭(그 순간이 시작 시간으로 기록됨) → ③ 끝까지 반복</b><br>
+      ⏱️ <b>① 재생 → ② <b>아래 「줄 목록」에서</b> 지금 나오는 가사를 클릭(그 순간이 시작 시간으로 기록됨) → ③ 끝까지 반복<br>
+      <span style="color:#c0392b; font-weight:700;">※ 파형 위의 꼬리표와 「▶ 이동」은 기록이 아니라 「그 자리로 이동」입니다.</span></b><br>
       파형을 보면서 소리가 시작되는 지점을 눈으로 확인하며 맞추면 더 정확해요.
+      <details style="margin-top:6px;"><summary style="cursor:pointer; color:#c0392b; font-weight:700;">💡 시간이 틀렸을 때 고치는 법 (눌러서 보기)</summary>
+      <div style="margin-top:6px; line-height:1.9;">
+        <b>한 줄 요약 — 기록은 「가사 글씨」, 이동은 「▶ 이동」, 미세 수정은 「초 칸」과 「꼬리표」.</b>
+        <table style="width:100%; margin:8px 0; border-collapse:collapse; font-size:15px;">
+          <tr><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>▶ 재생 / ⏸ 일시정지</b></td><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;">노래를 듣는다 — 시간은 안 바뀜</td></tr>
+          <tr><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>◀ -5초 / +5초 ▶</b></td><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;">듣는 위치를 5초씩 — 시간은 안 바뀜</td></tr>
+          <tr><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>줄 목록의 가사 글씨</b></td><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>지금 듣는 순간을 그 줄 시간으로 기록</b></td></tr>
+          <tr><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>「초」 칸</b></td><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;">숫자를 직접 넣어 고침 (0.1초 단위)</td></tr>
+          <tr><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;"><b>▶ 이동</b></td><td style="padding:4px 6px; border-bottom:1px solid #e6e9ee;">듣는 위치를 그 줄 자리로 점프 — 시간은 안 바뀜</td></tr>
+          <tr><td style="padding:4px 6px;"><b>파형 위 꼬리표</b></td><td style="padding:4px 6px;">그 줄이 몇 초에 있는지 표시. <b>끌면 시간이 바뀜</b></td></tr>
+        </table>
+        <b>고치는 법 3가지</b><br>
+        ① <b>다시 클릭</b> — 그 줄 <b>[▶ 이동]</b> → 재생 → 가사가 나오는 순간 그 줄 가사 클릭. <b>전 시간을 덮어씁니다.</b> 몇 번이고 다시 해도 됩니다<br>
+        ② <b>숫자로</b> — 그 줄 <b>[초]</b> 칸에 <code>12.4</code> 처럼 입력. 0.1초 단위라 가장 확실합니다<br>
+        ③ <b>끌어서</b> — 파형 위 꼬리표를 좌우로 끌기. 소리가 시작되는 지점을 눈으로 보면서 맞춥니다<br>
+        <div style="margin-top:8px; background:#fff8e1; border:1px solid #e3cf8f; border-radius:8px; padding:8px 10px;">
+          <b>가장 흔한 경우 — 「가사가 조금 늦게 나옵니다」</b><br>
+          그 줄 <b>[초]</b> 칸 숫자에서 <b>0.3~0.5를 빼세요.</b> 자막이 그만큼 빨리 뜹니다.
+        </div>
+      </div>
+      </details>
       <details style="margin-top:6px;"><summary style="cursor:pointer; color:#c0392b; font-weight:700;">💡 팁 — 더 정밀하게 맞추는 법 (눌러서 보기)</summary>
       · 타임라인에서 줄 태그를 마우스로 직접 끌어서 위치를 옮기거나, 목록 오른쪽 숫자 칸에 초 단위로 직접 입력할 수 있습니다.<br>
       · 간주가 길면 타임라인의 그 줄 태그를 클릭하거나 목록의 "▶ 이동"을 누르세요 — 그 줄 근처로 바로 이동해서 매번 처음부터 들을 필요가 없습니다.
@@ -732,10 +766,10 @@
   <div style="text-align:center; margin-top:28px; padding-top:16px; border-top:1px solid var(--border); color:var(--muted); font-size:12px;">
     <div><b>가사영상</b>은 무료입니다. 출처 표기를 부탁드립니다.</div>
     <div style="margin-top:6px;"><a href="https://www.youtube.com/@60ai만들기" target="_blank" style="color:#0f9d63; font-weight:800; font-size:14px; text-decoration:underline; white-space:nowrap;">사용법 영상 보기 @60ai만들기</a></div>
-    <div style="opacity:0.8; margin-top:6px;">v2.9.1 · 2026-10-23</div>
+    <div style="opacity:0.8; margin-top:6px;">v2.9.2 · 2026-10-23</div>
     <details id="verBox" style="margin-top:6px;">
       <summary style="cursor:pointer; color:#0f9d63; font-weight:700; list-style:none;">수정 이력 보기</summary>
-      <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:8px; line-height:1.9;">v2.9.1 · 2026-10-23 · 버튼 이름을 「가사 붙여넣기 / 카톡·메모로 복사」로 — 어디서 와서 어디로 가는지 보이게<br>v2.9.0 · 2026-10-23 · <b>가사 보관함</b>(곡 이름으로 담아 두면 가사와 타이밍이 같이 돌아옵니다) · <b>📋 복사</b> 버튼 · 자동저장 안내 문구<br>v2.8.4 · 2026-10-23 · 펼친 단계 맨 아래에 「▲ 이 단계 접기」 버튼 추가 (끝까지 내려간 자리에서 바로 접힘)<br>v2.8.3 · 2026-10-23 · 단계 안내문을 한 줄로 · 4단계 제목을 짧게 · 화살표를 수정 이력과 같은 방식(▶ ▼)으로 통일<br>v2.8.2 · 2026-10-23 · 수정 이력을 접었다 펴는 방식으로 (화면이 길어지지 않게)<br>v2.8.1 · 2026-10-22 · 줄을 누르면 재생이 처음으로 되돌아가던 것 수정 · 폰에서 가사를 아래 한 줄로 내리고 「▶ 이동」을 오른쪽 끝으로<br>v2.8.0 · 2026-10-22 · 폰에서 줄 목록을 눌러도 시간이 안 찍히던 것 수정 · 사진을 여러 번 나눠 고를 수 있게 함 · 「대기 중」에 안내 문구 붙임<br>v2.7.1 · 2026-10-19 · 2·3단계를 누르면 화면이 지나치던 것 수정<br>v2.7.0 · 2026-10-19 · 6단계를 접었다 펴는 방식으로 — 화면 길이 70% 줄임<br>v2.6.0 · 2026-08-20 · 갤럭시 파일 선택 문제 해결 (형식 제한 없앰)<br>v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
+      <span id="appVersion" style="opacity:0.7; display:inline-block; text-align:left; margin-top:8px; line-height:1.9;">v2.9.2 · 2026-10-23 · <b>「전주」「간주」가 자막에 찍히던 것 수정</b>(괄호 없어도 인식) · 영문 가사 붙여넣기 버튼 · 보관 이름이 「전주」로 되던 것 수정 · 타이밍 안내 문구 · <b>「시간이 틀렸을 때 고치는 법」 접는 안내</b> · <b>영문 줄이 밀리던 것 수정</b>(``` 같은 잡줄 자동 제외 · 줄 수 맞춤 표시)<br>v2.9.1 · 2026-10-23 · 버튼 이름을 「가사 붙여넣기 / 카톡·메모로 복사」로 — 어디서 와서 어디로 가는지 보이게<br>v2.9.0 · 2026-10-23 · <b>가사 보관함</b>(곡 이름으로 담아 두면 가사와 타이밍이 같이 돌아옵니다) · <b>📋 복사</b> 버튼 · 자동저장 안내 문구<br>v2.8.4 · 2026-10-23 · 펼친 단계 맨 아래에 「▲ 이 단계 접기」 버튼 추가 (끝까지 내려간 자리에서 바로 접힘)<br>v2.8.3 · 2026-10-23 · 단계 안내문을 한 줄로 · 4단계 제목을 짧게 · 화살표를 수정 이력과 같은 방식(▶ ▼)으로 통일<br>v2.8.2 · 2026-10-23 · 수정 이력을 접었다 펴는 방식으로 (화면이 길어지지 않게)<br>v2.8.1 · 2026-10-22 · 줄을 누르면 재생이 처음으로 되돌아가던 것 수정 · 폰에서 가사를 아래 한 줄로 내리고 「▶ 이동」을 오른쪽 끝으로<br>v2.8.0 · 2026-10-22 · 폰에서 줄 목록을 눌러도 시간이 안 찍히던 것 수정 · 사진을 여러 번 나눠 고를 수 있게 함 · 「대기 중」에 안내 문구 붙임<br>v2.7.1 · 2026-10-19 · 2·3단계를 누르면 화면이 지나치던 것 수정<br>v2.7.0 · 2026-10-19 · 6단계를 접었다 펴는 방식으로 — 화면 길이 70% 줄임<br>v2.6.0 · 2026-08-20 · 갤럭시 파일 선택 문제 해결 (형식 제한 없앰)<br>v2.5.4 · 2026-08-19 · 채널 표시 · 가로/세로 선택 · 글꼴 멈춤 수정 · 문구 정리<br>v2.2.0 · 2026-08-18 · 이름 변경 · 가사 칸 맨 위로 · 인앱 브라우저 안내<br>v2.0.1 · 2026-08-15 · 자막 잘림 수정</span>
     </details>
   </div>
 </div>
@@ -1026,11 +1060,33 @@ function buildEnglishLineQueueMap(koreanLines, englishLines) {
   return map;
 }
 
+// v2.9.2 — 가사가 아닌 「잡줄」을 가려낸다.
+// .md 나 블로그에서 복사하면 ``` 같은 코드 울타리, --- 같은 구분선이 같이 따라온다.
+// 그게 한 줄로 세어지면 그 뒤 영문이 전부 한 줄씩 밀린다 (10-23 친구 영상에서 확인).
+function isNoiseLine(s) {
+  var x = stripInvisible(s || '').trim();
+  if (!x) return true;
+  if (/^[`~]{3,}/.test(x)) return true;        // ``` 또는 ~~~
+  if (/^[-=*_]{3,}$/.test(x)) return true;     // --- === *** ___
+  return false;
+}
+// 화면에 자막을 안 띄울 줄 — 간주 표시 + 잡줄
+function isSilentLine(text) {
+  return isInterludeMarker(text) || isNoiseLine(text);
+}
+function realLyricLines(text) {
+  return splitLyricsLines(text).filter(function (s) {
+    return !isNoiseLine(s) && !isInterludeMarker(s);
+  });
+}
+
 function applyEnglishLyrics(parsed) {
   const enText = englishLyricsInput ? englishLyricsInput.value.trim() : '';
   if (!enText) return parsed;
-  const koreanLines = splitLyricsLines(lyricsInput.value);
-  const englishLines = splitLyricsLines(englishLyricsInput.value);
+  // ⚠️ 간주 표시 줄과 잡줄은 양쪽에서 똑같이 뺀 뒤 번호를 맞춘다.
+  //    그래야 영문 칸에 「전주·간주」를 적든 안 적든 똑같이 들어맞는다.
+  const koreanLines = realLyricLines(lyricsInput.value);
+  const englishLines = realLyricLines(englishLyricsInput.value);
   const queueMap = buildEnglishLineQueueMap(koreanLines, englishLines);
   return parsed.map(entry => {
     if (isInterludeMarker(entry.text)) return entry; // (간주) 줄엔 영문 안 붙임
@@ -1275,7 +1331,12 @@ function splitLyricsLines(text) {
 // "(간주)" 한 줄만 정확히 입력하면 그 구간에서는 화면에 자막 글씨가 나오지 않습니다
 // (전주/간주처럼 가사가 없는 구간의 타이밍 표시용 — 타이밍은 다른 줄처럼 그대로 맞추면 됩니다).
 function isInterludeMarker(text) {
-  return stripInvisible(text || '').trim() === '(간주)';
+  // v2.9.2 — 전에는 「(간주)」 한 가지만 알아봤다. 그래서 「전주」 「간주」 라고만 적으면
+  //           그 글자가 영상 자막에 그대로 찍혀 나왔다 (10-23 친구 영상에서 확인).
+  //           이제 괄호가 있든 없든, 전주·간주·후주·연주 를 모두 표시 줄로 본다.
+  var s = stripInvisible(text || '').trim();
+  s = s.replace(/^[\(\[<【「]+|[\)\]>】」]+$/g, '').replace(/\s+/g, '');
+  return s === '간주' || s === '전주' || s === '후주' || s === '연주';
 }
 
 // v2.5.2: 채널 표시(@60ai만들기)가 켜져 있으면 자막을 살짝 위로 올려 겹치지 않게 합니다.
@@ -2435,6 +2496,53 @@ if (copyLyricsBtn) {
   });
 }
 
+// ── 📥 영문 가사 붙여넣기 (v2.9.2) ────────────────────────────
+const pasteEnglishBtn = document.getElementById('pasteEnglishBtn');
+const englishSaveState = document.getElementById('englishSaveState');
+function showEnglishMsg(msg, color) {
+  if (!englishSaveState) return;
+  englishSaveState.textContent = msg || '\u00a0';
+  englishSaveState.style.color = color || '#0f9d63';
+  clearTimeout(englishSaveState._t);
+  englishSaveState._t = setTimeout(() => { englishSaveState.textContent = '\u00a0'; }, 2600);
+}
+if (pasteEnglishBtn && englishLyricsInput) {
+  pasteEnglishBtn.addEventListener('click', async () => {
+    let text = '';
+    try { text = await navigator.clipboard.readText(); }
+    catch (e) {
+      englishLyricsInput.focus();
+      showEnglishMsg('브라우저가 막았습니다 — 아래 칸을 길게 눌러 붙여넣기', '#c0392b');
+      return;
+    }
+    if (!text || !text.trim()) { showEnglishMsg('복사해 둔 글이 없습니다', '#c0392b'); return; }
+    if (englishLyricsInput.value.trim() &&
+        !confirm('이미 입력된 영문 가사가 있습니다.\n복사해 온 내용으로 바꿀까요?')) return;
+    englishLyricsInput.value = text.trim();
+    englishLyricsInput.dispatchEvent(new Event('input', { bubbles: true }));
+    showEnglishMsg('붙여넣었습니다 ✓');
+  });
+}
+
+// ── 🔢 한국어 · 영문 줄 수 맞춤 표시 (v2.9.2) ──────────────────
+const enCountBox = document.getElementById('enCount');
+function updateEnCount() {
+  if (!enCountBox || !englishLyricsInput) return;
+  const ko = realLyricLines(lyricsInput.value).length;
+  const en = realLyricLines(englishLyricsInput.value).length;
+  if (!en) { enCountBox.textContent = ''; return; }
+  if (ko === en) {
+    enCountBox.textContent = '한국어 ' + ko + '줄 · 영문 ' + en + '줄 — 딱 맞습니다 ✓ ';
+    enCountBox.style.color = '#0f9d63';
+  } else {
+    enCountBox.textContent = '⚠️ 한국어 ' + ko + '줄 · 영문 ' + en + '줄 — 줄 수가 다릅니다. 이대로면 영문이 밀립니다. ';
+    enCountBox.style.color = '#c0392b';
+  }
+}
+if (englishLyricsInput) englishLyricsInput.addEventListener('input', updateEnCount);
+lyricsInput.addEventListener('input', updateEnCount);
+updateEnCount();
+
 // ── 💾 가사 보관함 (v2.9.0) ────────────────────────────────────
 const SHELF_KEY = 'lyricVideoStudio_shelf_v1';
 const shelfSelect = document.getElementById('shelfSelect');
@@ -2464,7 +2572,10 @@ function shelfRender() {
 }
 if (shelfSaveBtn) shelfSaveBtn.addEventListener('click', () => {
   if (!lyricsInput.value.trim()) { showLyricsSaved('보관할 가사가 없습니다', '#c0392b'); return; }
-  const first = (lyricsInput.value.trim().split('\n')[0] || '').slice(0, 20);
+  // v2.9.2 — 전에는 첫 줄을 그대로 썼다. 첫 줄이 「전주」면 「전주」로 보관됐다.
+  const lines0 = lyricsInput.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const realLine = lines0.find(s => !isInterludeMarker(s)) || lines0[0] || '';
+  const first = realLine.slice(0, 20);
   const name = (prompt('이 가사를 무슨 이름으로 보관할까요?', first) || '').trim();
   if (!name) return;
   const list = shelfRead();
@@ -2863,7 +2974,7 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
   const validLineSet = new Set(splitLyricsLines(lyricsInput.value));
   // v2.0: 영문 가사가 붙은 줄은 L.text가 "한국어\n영문" 형태이므로, 검사는 한국어(첫 줄) 부분만
   // 1번 칸과 비교합니다(영문은 1번 칸에 없는 게 당연하므로 오탐 방지).
-  const orphanLines = lyrics.filter(L => L.text && !isInterludeMarker(L.text) && !validLineSet.has(L.text.split('\n')[0]));
+  const orphanLines = lyrics.filter(L => L.text && !isSilentLine(L.text) && !validLineSet.has(L.text.split('\n')[0]));
   if (orphanLines.length) {
     const uniqueTexts = [...new Set(orphanLines.map(L => L.text))];
     const preview = uniqueTexts.slice(0, 5).map(t => `"${t}"`).join(', ');
@@ -3052,9 +3163,9 @@ async function runRender({ maxSeconds, isTest, mobileMode }) {
     if (curIdx !== -1) {
       const curL = lyrics[curIdx];
       const nextL = lyrics[curIdx + 1];
-      const curIsInterlude = isInterludeMarker(curL.text);
+      const curIsInterlude = isSilentLine(curL.text);
       if (nextL) {
-        const nextIsInterlude = isInterludeMarker(nextL.text);
+        const nextIsInterlude = isSilentLine(nextL.text);
         const fadeStart = nextL.start - crossfade;
         if (crossfade > 0 && t >= fadeStart) {
           const alpha = Math.min(1, Math.max(0, (t - fadeStart) / crossfade));
